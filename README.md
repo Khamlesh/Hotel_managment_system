@@ -31,8 +31,14 @@ This repository contains the complete relational database schema for a **Hotel M
 12. **Maintenance** – Tracks room issues and repair status  
 13. **Event** – Stores planned hotel events and details  
 14. **Event Booking** – Manages event bookings and customer requests  
-15. **Feedback** – Records customer reviews and staff responses  
+15. **Feedback** – Records customer reviews and staff responses  \
 
+16. ## Technologies Used
+- **Database:** MySQL 
+- **Design Tool:** dbdiagram.io  (for ERD visualization)  
+- **Languages:** SQL 
 
-
+## Team Members
+- **[Surya siddardha]** – [GitHubUsername1](https://github.com/suryasiddardha)  
+- 
 
