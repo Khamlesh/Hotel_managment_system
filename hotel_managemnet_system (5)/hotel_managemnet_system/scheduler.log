@@ -1,0 +1,22 @@
+2025-04-22 21:50:51,116 - maintenance_scheduler - INFO - Starting maintenance task scheduler
+2025-04-22 21:50:51,116 - maintenance_scheduler - INFO - Checking for scheduled tasks at 2025-04-22 21:50:51.116469
+2025-04-22 21:50:53,146 - maintenance_scheduler - INFO - Successfully processed tasks: Task_Schedule table does not exist.
+2025-04-22 21:50:53,146 - maintenance_scheduler - INFO - Sleeping for 300 seconds
+2025-04-22 21:55:53,149 - maintenance_scheduler - INFO - Checking for scheduled tasks at 2025-04-22 21:55:53.149774
+2025-04-22 21:55:55,204 - maintenance_scheduler - INFO - Successfully processed tasks: Task_Schedule table does not exist.
+2025-04-22 21:55:55,209 - maintenance_scheduler - INFO - Sleeping for 300 seconds
+2025-04-22 22:00:55,212 - maintenance_scheduler - INFO - Checking for scheduled tasks at 2025-04-22 22:00:55.212007
+2025-04-22 22:00:57,270 - maintenance_scheduler - INFO - Successfully processed tasks: Task_Schedule table does not exist.
+2025-04-22 22:00:57,275 - maintenance_scheduler - INFO - Sleeping for 300 seconds
+2025-04-22 22:05:57,276 - maintenance_scheduler - INFO - Checking for scheduled tasks at 2025-04-22 22:05:57.276745
+2025-04-22 22:05:59,307 - maintenance_scheduler - INFO - Successfully processed tasks: Task_Schedule table does not exist.
+2025-04-22 22:05:59,307 - maintenance_scheduler - INFO - Sleeping for 300 seconds
+2025-04-22 22:10:59,310 - maintenance_scheduler - INFO - Checking for scheduled tasks at 2025-04-22 22:10:59.310692
+2025-04-22 22:11:01,337 - maintenance_scheduler - INFO - Successfully processed tasks: Task_Schedule table does not exist.
+2025-04-22 22:11:01,347 - maintenance_scheduler - INFO - Sleeping for 300 seconds
+2025-04-22 22:16:01,348 - maintenance_scheduler - INFO - Checking for scheduled tasks at 2025-04-22 22:16:01.348661
+2025-04-22 22:16:03,390 - maintenance_scheduler - INFO - Successfully processed tasks: Task_Schedule table does not exist.
+2025-04-22 22:16:03,390 - maintenance_scheduler - INFO - Sleeping for 300 seconds
+2025-04-22 22:21:03,394 - maintenance_scheduler - INFO - Checking for scheduled tasks at 2025-04-22 22:21:03.394890
+2025-04-22 22:21:05,431 - maintenance_scheduler - INFO - Successfully processed tasks: Task_Schedule table does not exist.
+2025-04-22 22:21:05,431 - maintenance_scheduler - INFO - Sleeping for 300 seconds

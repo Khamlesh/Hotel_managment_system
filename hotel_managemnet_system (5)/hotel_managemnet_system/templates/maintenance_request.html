@@ -1,0 +1,67 @@
+{% extends "layout.html" %}
+
+{% block title %}Report Maintenance Issue{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Report Maintenance Issue</h3>
+                </div>
+                <div class="card-body">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }}">{{ message }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                    
+                    <form method="POST" action="{{ url_for('create_maintenance_request') }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        
+                        <div class="form-group mb-3">
+                            <label for="room_id"><strong>Room Number</strong></label>
+                            <select class="form-control" id="room_id" name="room_id" required>
+                                <option value="">Select Room</option>
+                                {% for room in rooms %}
+                                    <option value="{{ room.Room_ID }}">{{ room.Room_Number }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label for="issue_reported"><strong>Describe the Issue</strong></label>
+                            <textarea class="form-control" id="issue_reported" name="issue_reported" rows="5" required placeholder="Please describe the maintenance issue in detail..."></textarea>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label for="priority"><strong>Priority</strong></label>
+                            <select class="form-control" id="priority" name="priority">
+                                <option value="Low">Low</option>
+                                <option value="Medium" selected>Medium</option>
+                                <option value="High">High</option>
+                                <option value="Emergency">Emergency</option>
+                            </select>
+                            <small class="form-text text-muted">
+                                <ul>
+                                    <li><strong>Low</strong>: Minor issue, can wait</li>
+                                    <li><strong>Medium</strong>: Standard issue that needs attention</li>
+                                    <li><strong>High</strong>: Significant issue affecting stay comfort</li>
+                                    <li><strong>Emergency</strong>: Urgent issue requiring immediate attention</li>
+                                </ul>
+                            </small>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">Submit Request</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

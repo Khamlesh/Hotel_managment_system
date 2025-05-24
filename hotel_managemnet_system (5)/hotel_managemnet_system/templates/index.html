@@ -1,0 +1,258 @@
+{% extends "layout.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero text-center position-relative">
+    <div class="hero-img" style="background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=1470&auto=format&fit=crop'); background-size: cover; background-position: center; height: 600px; display: flex; align-items: center; justify-content: center;">
+        <div class="container text-white">
+            <h1 class="display-4 fw-bold mb-4">Experience Luxury & Comfort</h1>
+            <p class="lead fs-4 mb-5">Discover the perfect balance of luxury, comfort, and value at our hotel. Book your stay today for an unforgettable experience.</p>
+            <a href="{{ url_for('rooms') }}" class="btn btn-primary btn-lg px-5 py-3">Explore Rooms</a>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Rooms -->
+<section class="container my-5 py-5">
+    <div class="text-center mb-5">
+        <h2 class="display-5 fw-bold">Featured Room Types</h2>
+        <p class="lead">Choose from our selection of premium accommodations</p>
+    </div>
+    
+    <div class="row">
+        {% for room_type in room_types %}
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card room-card h-100 shadow">
+                {% if room_type.Type_Name == 'Standard' %}
+                <img src="https://images.unsplash.com/photo-1611892440504-42a792e24d32?q=80&w=1770&auto=format&fit=crop" class="card-img-top" alt="Standard Room">
+                {% elif room_type.Type_Name == 'Deluxe' %}
+                <img src="https://images.unsplash.com/photo-1618773928121-c32242e63f39?q=80&w=1770&auto=format&fit=crop" class="card-img-top" alt="Deluxe Room">
+                {% elif room_type.Type_Name == 'Suite' %}
+                <img src="https://images.unsplash.com/photo-1591088398332-8a7791972843?q=80&w=1774&auto=format&fit=crop" class="card-img-top" alt="Suite Room">
+                {% else %}
+                <img src="https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?q=80&w=1770&auto=format&fit=crop" class="card-img-top" alt="Family Room">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ room_type.Type_Name }} Room</h5>
+                    <p class="card-text">{{ room_type.Description }}</p>
+                    <p class="price mb-3 text-primary fw-bold">₹{{ room_type.Base_Price }} <small class="text-muted">per night</small></p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a href="{{ url_for('room_details', room_type_id=room_type.Room_Type_ID) }}" class="btn btn-outline-primary">View Details</a>
+                        <span class="badge bg-info">{{ room_type.Max_Occupancy }} Guests</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Features -->
+<section class="bg-light py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="display-5 fw-bold">Why Choose Our Hotel</h2>
+            <p class="lead">We offer a superior guest experience with top amenities</p>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-3 text-center">
+                <div class="feature-icon">
+                    <i class="fas fa-wifi fa-3x text-primary mb-3"></i>
+                </div>
+                <h5>Free High-Speed WiFi</h5>
+                <p>Stay connected with complimentary high-speed internet access throughout the property.</p>
+            </div>
+            
+            <div class="col-md-3 text-center">
+                <div class="feature-icon">
+                    <i class="fas fa-utensils fa-3x text-primary mb-3"></i>
+                </div>
+                <h5>Gourmet Dining</h5>
+                <p>Enjoy exquisite cuisine at our on-site restaurant featuring local and international dishes.</p>
+            </div>
+            
+            <div class="col-md-3 text-center">
+                <div class="feature-icon">
+                    <i class="fas fa-spa fa-3x text-primary mb-3"></i>
+                </div>
+                <h5>Spa & Wellness</h5>
+                <p>Relax and rejuvenate at our spa with a variety of treatments and therapies.</p>
+            </div>
+            
+            <div class="col-md-3 text-center">
+                <div class="feature-icon">
+                    <i class="fas fa-concierge-bell fa-3x text-primary mb-3"></i>
+                </div>
+                <h5>24/7 Concierge</h5>
+                <p>Our attentive staff is available round the clock to assist with all your needs.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Hotel Image Showcase -->
+<section class="container my-5 py-5">
+    <div class="text-center mb-5">
+        <h2 class="display-5 fw-bold">Explore Our Luxury Hotel</h2>
+        <p class="lead">Take a visual journey through our beautiful property</p>
+    </div>
+    
+    <div class="row g-3">
+        <div class="col-md-4">
+            <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1470&auto=format&fit=crop" alt="Hotel Lobby" class="img-fluid rounded shadow">
+        </div>
+        <div class="col-md-4">
+            <img src="https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=1470&auto=format&fit=crop" alt="Hotel Pool" class="img-fluid rounded shadow">
+        </div>
+        <div class="col-md-4">
+            <img src="https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?q=80&w=1470&auto=format&fit=crop" alt="Hotel View" class="img-fluid rounded shadow">
+        </div>
+        <div class="col-md-6 mt-3">
+            <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?q=80&w=1470&auto=format&fit=crop" alt="Hotel Restaurant" class="img-fluid rounded shadow">
+        </div>
+        <div class="col-md-6 mt-3">
+            <img src="https://images.unsplash.com/photo-1575429198097-0414ec08e8cd?q=80&w=1470&auto=format&fit=crop" alt="Hotel Spa" class="img-fluid rounded shadow">
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials -->
+<section class="container my-5 py-5">
+    <div class="text-center mb-5">
+        <h2 class="display-5 fw-bold">What Our Guests Say</h2>
+        <p class="lead">Hear from our satisfied guests about their experiences</p>
+    </div>
+    
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div id="testimonialCarousel" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                        <div class="card border-0 shadow">
+                            <div class="card-body text-center p-5">
+                                <i class="fas fa-quote-left fa-2x text-primary mb-3"></i>
+                                <p class="lead mb-4">"An exceptional stay! The staff was incredibly attentive, the room was spotless and luxurious, and the amenities exceeded my expectations."</p>
+                                <div class="d-flex justify-content-center mb-2">
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                </div>
+                                <h5 class="mb-0">Michael Johnson</h5>
+                                <small class="text-muted">Business Traveler</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="carousel-item">
+                        <div class="card border-0 shadow">
+                            <div class="card-body text-center p-5">
+                                <i class="fas fa-quote-left fa-2x text-primary mb-3"></i>
+                                <p class="lead mb-4">"Perfect family vacation! The pool was amazing, and the family room had everything we needed. Kids loved the activities and the staff was so friendly."</p>
+                                <div class="d-flex justify-content-center mb-2">
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                </div>
+                                <h5 class="mb-0">Emily Rodriguez</h5>
+                                <small class="text-muted">Family Traveler</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="bg-primary text-white text-center py-5">
+    <div class="container">
+        <h2 class="display-5 fw-bold">Ready to Book Your Stay?</h2>
+        <p class="lead mb-4">Reserve your room now for the best rates and availability.</p>
+        <a href="{{ url_for('rooms') }}" class="btn btn-light btn-lg px-5 py-3">Book Now</a>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .room-card {
+        transition: transform 0.3s ease;
+        overflow: hidden;
+    }
+    
+    .room-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .room-card img {
+        height: 200px;
+        object-fit: cover;
+    }
+    
+    .hero-img {
+        position: relative;
+    }
+    
+    .price {
+        font-size: 1.5rem;
+    }
+    
+    .feature-icon {
+        background-color: rgba(13, 110, 253, 0.1);
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Set minimum date for check-in and check-out
+        const today = new Date().toISOString().split('T')[0];
+        
+        // Check if elements exist before accessing them
+        const checkIn = document.getElementById('check-in');
+        const checkOut = document.getElementById('check-out');
+        
+        if (checkIn) {
+            checkIn.min = today;
+            
+            checkIn.addEventListener('change', function() {
+                if (checkOut) {
+                    checkOut.min = this.value;
+                    
+                    // If check-out date is earlier than check-in, update it
+                    if(checkOut.value < this.value) {
+                        checkOut.value = this.value;
+                    }
+                }
+            });
+        }
+        
+        if (checkOut) {
+            checkOut.min = today;
+        }
+    });
+</script>
+{% endblock %} 

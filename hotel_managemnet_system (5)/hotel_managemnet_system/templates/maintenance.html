@@ -1,0 +1,78 @@
+{% extends "layout.html" %}
+
+{% block title %}Maintenance Request{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Room Maintenance Request</h3>
+                </div>
+                <div class="card-body">
+                    <!-- Maintenance Request Form -->
+                    <form action="{{ url_for('submit_maintenance') }}" method="POST">
+                        <div class="mb-3">
+                            <label for="room_id" class="form-label">Select Room</label>
+                            <select class="form-select" id="room_id" name="room_id" required>
+                                <option value="">-- Select a Room --</option>
+                                {% for room in rooms %}
+                                <option value="{{ room.Room_ID }}">Room {{ room.Room_Number }} ({{ room.room_type.Type_Name if room.room_type else 'N/A' }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="issue" class="form-label">Describe the Issue</label>
+                            <textarea class="form-control" id="issue" name="issue" rows="4" placeholder="Please describe the maintenance issue in detail..." required></textarea>
+                        </div>
+                        <div class="form-text mb-3">
+                            <p>Please provide as much detail as possible about the issue. This helps our maintenance team respond appropriately.</p>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Submit Request</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Previous Maintenance Requests -->
+            {% if user_requests %}
+            <div class="card shadow mt-4">
+                <div class="card-header bg-secondary text-white">
+                    <h4 class="mb-0">Your Previous Maintenance Requests</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Room</th>
+                                    <th>Issue</th>
+                                    <th>Reported On</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for request in user_requests %}
+                                <tr>
+                                    <td>Room {{ request.room.Room_Number }}</td>
+                                    <td>{{ request.Issue_Reported[:50] }}{% if request.Issue_Reported|length > 50 %}...{% endif %}</td>
+                                    <td>{{ request.Report_Date.strftime('%Y-%m-%d') }}</td>
+                                    <td>
+                                        <span class="badge {% if request.Maintenance_Status == 'Pending' %}bg-warning{% elif request.Maintenance_Status == 'Ongoing' %}bg-info{% elif request.Maintenance_Status == 'Completed' %}bg-success{% endif %}">
+                                            {{ request.Maintenance_Status }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

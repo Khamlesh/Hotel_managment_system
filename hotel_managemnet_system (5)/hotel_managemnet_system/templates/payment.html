@@ -1,0 +1,315 @@
+    {% extends "layout.html" %}
+
+    {% block title %}Payment{% endblock %}
+
+    {% block content %}
+    <div class="container my-5">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="form-container card shadow">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="mb-0">Complete Your Payment</h3>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="card mb-4 bg-light">
+                            <div class="card-header">
+                                <h5 class="mb-0">Reservation Summary</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row mb-2">
+                                    <div class="col-md-6 fw-bold">Check-in Date:</div>
+                                    <div class="col-md-6">{{ reservation.Check_In_Date.strftime('%B %d, %Y') }}</div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-md-6 fw-bold">Check-out Date:</div>
+                                    <div class="col-md-6">{{ reservation.Check_Out_Date.strftime('%B %d, %Y') }}</div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-md-6 fw-bold">Room:</div>
+                                    <div class="col-md-6">{{ reservation.room.room_type.Type_Name }} - Room {{ reservation.room.Room_Number }}</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 fw-bold">Total Amount:</div>
+                                    <div class="col-md-6 text-primary fw-bold">₹{{ "%.2f"|format(reservation.Total_Cost) }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <form id="payment-form" method="POST" action="{{ url_for('payment', reservation_id=reservation.Reservation_ID) }}" class="needs-validation" novalidate>
+                            <div class="mb-4">
+                                <h5>Payment Method</h5>
+                                <div class="payment-methods mb-3">
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="radio" name="payment_method" id="credit_card" value="Credit Card" checked>
+                                        <label class="form-check-label" for="credit_card">
+                                            <img src="https://cdn-icons-png.flaticon.com/128/179/179431.png" alt="Credit Card" height="24" class="me-2">
+                                            Credit Card
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="radio" name="payment_method" id="paypal" value="PayPal">
+                                        <label class="form-check-label" for="paypal">
+                                            <img src="https://cdn-icons-png.flaticon.com/128/174/174861.png" alt="PayPal" height="24" class="me-2">
+                                            PayPal
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="payment_method" id="bank_transfer" value="Bank Transfer">
+                                        <label class="form-check-label" for="bank_transfer">
+                                            <img src="https://cdn-icons-png.flaticon.com/128/1599/1599098.png" alt="Bank Transfer" height="24" class="me-2">
+                                            Bank Transfer
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div id="credit-card-form">
+                                <div class="mb-3">
+                                    <label for="card_number" class="form-label">Card Number</label>
+                                    <input type="text" class="form-control" id="card_number" placeholder="1234 5678 9012 3456" required>
+                                    <div class="invalid-feedback">Please enter a valid card number.</div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="expiry_date" class="form-label">Expiry Date</label>
+                                        <input type="text" class="form-control" id="expiry_date" placeholder="MM/YY" required>
+                                        <div class="invalid-feedback">Please enter a valid expiry date.</div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="cvv" class="form-label">CVV</label>
+                                        <input type="text" class="form-control" id="cvv" placeholder="123" required>
+                                        <div class="invalid-feedback">Please enter a valid CVV.</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label for="card_name" class="form-label">Name on Card</label>
+                                    <input type="text" class="form-control" id="card_name" placeholder="John Doe" required>
+                                    <div class="invalid-feedback">Please enter the name on your card.</div>
+                                </div>
+                            </div>
+                            
+                            <!-- PayPal Form (Initially Hidden) -->
+                            <div id="paypal-form" style="display: none;">
+                                <div class="alert alert-info mb-4">
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-info-circle-fill me-3 fs-4"></i>
+                                        <div>
+                                            <p class="mb-0">You'll be redirected to PayPal to complete your payment securely.</p>
+                                            <small>You can use your PayPal balance, bank account, or credit cards linked to your PayPal account.</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="text-center mb-4">
+                                    <img src="https://cdn-icons-png.flaticon.com/512/174/174861.png" alt="PayPal" height="60">
+                                </div>
+                            </div>
+                            
+                            <!-- Bank Transfer Form (Initially Hidden) -->
+                            <div id="bank-transfer-form" style="display: none;">
+                                <div class="alert alert-info mb-4">
+                                    <i class="bi bi-info-circle-fill me-2"></i>
+                                    Please make a bank transfer to the following account with your reservation ID as reference:
+                                </div>
+                                <div class="card bg-light mb-4">
+                                    <div class="card-body">
+                                        <div class="row mb-2">
+                                            <div class="col-md-4 fw-bold">Bank Name:</div>
+                                            <div class="col-md-8">First National Bank</div>
+                                        </div>
+                                        <div class="row mb-2">
+                                            <div class="col-md-4 fw-bold">Account Name:</div>
+                                            <div class="col-md-8">Arora Hotel Ltd.</div>
+                                        </div>
+                                        <div class="row mb-2">
+                                            <div class="col-md-4 fw-bold">Account Number:</div>
+                                            <div class="col-md-8">1234567890</div>
+                                        </div>
+                                        <div class="row mb-2">
+                                            <div class="col-md-4 fw-bold">SWIFT Code:</div>
+                                            <div class="col-md-8">FNBUSA123456</div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-4 fw-bold">Reference:</div>
+                                            <div class="col-md-8">BOOKING-{{ reservation.Reservation_ID }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mb-4">
+                                    <label for="transfer_date" class="form-label">Transfer Date</label>
+                                    <input type="date" class="form-control" id="transfer_date" name="transfer_date" min="{{ today }}" required>
+                                    <div class="invalid-feedback">Please enter the transfer date.</div>
+                                </div>
+                                <div class="mb-4">
+                                    <label for="transfer_reference" class="form-label">Transfer Reference (Optional)</label>
+                                    <input type="text" class="form-control" id="transfer_reference" name="transfer_reference" placeholder="Transaction ID or reference number">
+                                    <small class="form-text text-muted">If available, please provide your bank's transaction reference.</small>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" id="terms" required>
+                                <label class="form-check-label" for="terms">I agree to the <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">terms and conditions</a></label>
+                                <div class="invalid-feedback">You must agree before submitting.</div>
+                            </div>
+                            
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary btn-lg">Complete Payment</button>
+                            </div>
+                            
+                            <div class="text-center mt-3">
+                                <small class="text-muted">Your payment information is encrypted and secure.</small>
+                                <div class="mt-2">
+                                    <img src="https://cdn-icons-png.flaticon.com/128/179/179431.png" alt="Visa" height="20" class="mx-1">
+                                    <img src="https://cdn-icons-png.flaticon.com/128/196/196578.png" alt="MasterCard" height="20" class="mx-1">
+                                    <img src="https://cdn-icons-png.flaticon.com/128/196/196548.png" alt="American Express" height="20" class="mx-1">
+                                    <img src="https://cdn-icons-png.flaticon.com/128/349/349221.png" alt="Discover" height="20" class="mx-1">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!-- Terms and Conditions Modal -->
+<div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="termsModalLabel">Terms and Conditions</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h6>1. Reservation and Payment Policy</h6>
+                <p>All reservations require a valid credit card at the time of booking. Your card will be charged the full amount upon completion of this payment process.</p>
+                
+                <h6>2. Cancellation Policy</h6>
+                <p>Cancellations made 48 hours or more before the check-in date are eligible for a full refund. Cancellations made less than 48 hours before check-in are non-refundable.</p>
+                
+                <h6>3. Check-in and Check-out Times</h6>
+                <p>Check-in time is 3:00 PM and check-out time is 12:00 PM. Early check-in and late check-out may be available for an additional fee, subject to availability.</p>
+                
+                <h6>4. Room Occupancy</h6>
+                <p>The maximum number of guests per room is limited to the number specified in your booking. Additional guests may result in extra charges or denial of accommodation.</p>
+                
+                <h6>5. Damage Responsibility</h6>
+                <p>Guests are responsible for any damage to the room or hotel property during their stay. Any damages will be charged to the credit card on file.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">I Agree</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const paymentMethodRadios = document.querySelectorAll('input[name="payment_method"]');
+        const creditCardForm = document.getElementById('credit-card-form');
+        const paypalForm = document.getElementById('paypal-form');
+        const bankTransferForm = document.getElementById('bank-transfer-form');
+        const paymentForm = document.getElementById('payment-form');
+        
+        // Toggle payment method forms
+        paymentMethodRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                // Hide all forms first
+                creditCardForm.style.display = 'none';
+                paypalForm.style.display = 'none';
+                bankTransferForm.style.display = 'none';
+                
+                // Show the selected form
+                if (this.value === 'Credit Card') {
+                    creditCardForm.style.display = 'block';
+                } else if (this.value === 'PayPal') {
+                    paypalForm.style.display = 'block';
+                } else if (this.value === 'Bank Transfer') {
+                    bankTransferForm.style.display = 'block';
+                }
+                
+                // Update required attributes based on the payment method
+                toggleRequiredFields();
+            });
+        });
+        
+        // Function to toggle required fields based on payment method
+        function toggleRequiredFields() {
+            const selectedMethod = document.querySelector('input[name="payment_method"]:checked').value;
+            
+            // Credit card fields
+            const ccFields = creditCardForm.querySelectorAll('input');
+            ccFields.forEach(field => {
+                field.required = (selectedMethod === 'Credit Card');
+            });
+            
+            // Bank transfer fields
+            if (bankTransferForm) {
+                const transferDate = document.getElementById('transfer_date');
+                if (transferDate) {
+                    transferDate.required = (selectedMethod === 'Bank Transfer');
+                }
+            }
+        }
+        
+        // Initial call to set required fields
+        toggleRequiredFields();
+        
+        // Format card number with spaces
+        const cardNumberInput = document.getElementById('card_number');
+        if (cardNumberInput) {
+            cardNumberInput.addEventListener('input', function(e) {
+                let value = this.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+                let formattedValue = '';
+                
+                for (let i = 0; i < value.length; i++) {
+                    if (i > 0 && i % 4 === 0) {
+                        formattedValue += ' ';
+                    }
+                    formattedValue += value[i];
+                }
+                
+                this.value = formattedValue;
+            });
+        }
+        
+        // Format expiry date
+        const expiryDateInput = document.getElementById('expiry_date');
+        if (expiryDateInput) {
+            expiryDateInput.addEventListener('input', function(e) {
+                let value = this.value.replace(/\D/g, '');
+                
+                if (value.length > 2) {
+                    this.value = value.substring(0, 2) + '/' + value.substring(2, 4);
+                } else {
+                    this.value = value;
+                }
+            });
+        }
+        
+        // Form submission
+        if (paymentForm) {
+            paymentForm.addEventListener('submit', function(e) {
+                if (!this.checkValidity()) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.classList.add('was-validated');
+                } else {
+                    // Show processing state on the button
+                    const submitBtn = this.querySelector('button[type="submit"]');
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...';
+                    
+                    // Let the form submit normally
+                    // This will follow the server-side redirection to payment_success
+                }
+            });
+        }
+    });
+</script>
+{% endblock %} 

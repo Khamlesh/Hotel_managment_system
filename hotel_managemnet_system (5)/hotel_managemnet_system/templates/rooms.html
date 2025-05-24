@@ -1,0 +1,414 @@
+{% extends "layout.html" %}
+
+{% block title %}Our Rooms{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row mb-5">
+        <div class="col-12 text-center">
+            <h1 class="display-4">Luxury Accommodations</h1>
+            <p class="lead">Experience comfort and elegance in our beautifully designed rooms</p>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-3 mb-4">
+            <div class="card shadow sticky-top" style="top: 20px; z-index: 1;">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Room Search</h5>
+                </div>
+                <div class="card-body">
+                    <form id="availability-form">
+                        <input type="hidden" name="room_type_id" value="">
+                        
+                        <div class="mb-3">
+                            <label for="check_in" class="form-label">Check-in Date</label>
+                            <input type="date" class="form-control" id="check_in" name="check_in" min="{{ now.strftime('%Y-%m-%d') }}" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="check_out" class="form-label">Check-out Date</label>
+                            <input type="date" class="form-control" id="check_out" name="check_out" min="{{ now.strftime('%Y-%m-%d') }}" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="guests" class="form-label">Guests</label>
+                            <select class="form-select" id="guests" name="guests">
+                                <option value="1">1 Person</option>
+                                <option value="2" selected>2 People</option>
+                                <option value="3">3 People</option>
+                                <option value="4">4 People</option>
+                                <option value="5">5+ People</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="room_type" class="form-label">Room Type</label>
+                            <select class="form-select" id="room_type" name="room_type">
+                                <option value="">All Types</option>
+                                {% for room_type in room_types %}
+                                <option value="{{ room_type.Room_Type_ID }}">{{ room_type.Type_Name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Check Availability</button>
+                        </div>
+                    </form>
+                    
+                    <div id="alert-placeholder" class="mt-3"></div>
+                    
+                    <div id="availability-results" class="mt-3">
+                        <!-- Availability results will be displayed here -->
+                    </div>
+                    
+                    <div class="alert alert-info mt-3 small">
+                        <i class="bi bi-info-circle-fill me-2"></i>
+                        Room availability is shown in real-time. Rooms with expired bookings are automatically returned to available status.
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-9">
+            {% for room_type in room_types %}
+            <div class="card mb-4 room-card shadow-sm" id="room-{{ room_type.Room_Type_ID }}">
+                <div class="row g-0">
+                    <div class="col-md-5">
+                        <div class="room-img-container">
+                            {% if room_type.Type_Name == 'Standard' %}
+                            <img src="https://images.unsplash.com/photo-1611892440504-42a792e24d32?q=80&w=1770&auto=format&fit=crop" class="img-fluid rounded-start h-100" alt="{{ room_type.Type_Name }} Room" style="object-fit: cover;">
+                            {% elif room_type.Type_Name == 'Deluxe' %}
+                            <img src="https://images.unsplash.com/photo-1618773928121-c32242e63f39?q=80&w=1770&auto=format&fit=crop" class="img-fluid rounded-start h-100" alt="{{ room_type.Type_Name }} Room" style="object-fit: cover;">
+                            {% elif room_type.Type_Name == 'Suite' %}
+                            <img src="https://images.unsplash.com/photo-1591088398332-8a7791972843?q=80&w=1774&auto=format&fit=crop" class="img-fluid rounded-start h-100" alt="{{ room_type.Type_Name }} Room" style="object-fit: cover;">
+                            {% elif room_type.Type_Name == 'Family' %}
+                            <img src="https://dynamic-media-cdn.tripadvisor.com/media/photo-o/27/2b/d4/95/family-room.jpg?w=900&h=500&s=1" class="img-fluid rounded-start h-100" alt="{{ room_type.Type_Name }} Room" style="object-fit: cover;">
+                            {% else %}
+                            <img src="https://images.unsplash.com/photo-1566665797739-1674de7a421a?q=80&w=1974&auto=format&fit=crop" class="img-fluid rounded-start h-100" alt="{{ room_type.Type_Name }} Room" style="object-fit: cover;">
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-7">
+                        <div class="card-body d-flex flex-column h-100">
+                            <div>
+                                <h3 class="card-title">{{ room_type.Type_Name }} Room</h3>
+                                <p class="card-text">{{ room_type.Description }}</p>
+                                
+                                <div class="room-features mb-3">
+                                    <span class="badge bg-light text-dark me-2 mb-2">
+                                        <i class="bi bi-people-fill me-1"></i> Up to {{ room_type.Max_Occupancy }} people
+                                    </span>
+                                    <span class="badge bg-light text-dark me-2 mb-2">
+                                        <i class="bi bi-layout-text-window me-1"></i> {{ room_type.Bed_Type }} Bed
+                                    </span>
+                                    {% if room_type.Type_Name == 'Deluxe' or room_type.Type_Name == 'Suite' %}
+                                    <span class="badge bg-light text-dark me-2 mb-2">
+                                        <i class="bi bi-tv me-1"></i> Smart TV
+                                    </span>
+                                    {% endif %}
+                                    {% if room_type.Type_Name == 'Suite' %}
+                                    <span class="badge bg-light text-dark me-2 mb-2">
+                                        <i class="bi bi-water me-1"></i> Jacuzzi
+                                    </span>
+                                    {% endif %}
+                                    <span class="badge bg-light text-dark me-2 mb-2">
+                                        <i class="bi bi-wifi me-1"></i> Free Wi-Fi
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-auto">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="price-display">
+                                        <span class="price">₹{{ "%.2f"|format(room_type.Base_Price) }}</span>
+                                        <span class="text-muted">/night</span>
+                                    </div>
+                                    <a href="{{ url_for('room_details', room_type_id=room_type.Room_Type_ID) }}" class="btn btn-outline-primary">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card bg-light">
+                <div class="card-body p-4">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h3>Special Offers</h3>
+                            <p class="mb-0">Book directly with us and get 10% off your stay plus complimentary breakfast!</p>
+                        </div>
+                        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                            <a href="#" class="btn btn-primary">View Special Offers</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .room-card {
+        transition: transform 0.3s ease;
+        overflow: hidden;
+    }
+    
+    .room-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .room-img-container {
+        height: 100%;
+        overflow: hidden;
+    }
+    
+    .price {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #0d6efd;
+    }
+    
+    .room-features .badge {
+        font-weight: 500;
+        padding: 0.5rem 0.8rem;
+        border-radius: 30px;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize the date inputs
+        const checkInDate = document.getElementById('check_in');
+        const checkOutDate = document.getElementById('check_out');
+        
+        // Set default dates (today and tomorrow)
+        const today = new Date();
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        
+        checkInDate.value = today.toISOString().split('T')[0];
+        checkOutDate.value = tomorrow.toISOString().split('T')[0];
+        
+        // Update minimum check-out date when check-in date changes
+        checkInDate.addEventListener('change', function() {
+            const selectedCheckIn = new Date(this.value);
+            const nextDay = new Date(selectedCheckIn);
+            nextDay.setDate(nextDay.getDate() + 1);
+            
+            checkOutDate.min = nextDay.toISOString().split('T')[0];
+            
+            if (new Date(checkOutDate.value) <= selectedCheckIn) {
+                checkOutDate.value = nextDay.toISOString().split('T')[0];
+            }
+        });
+        
+        // Filter rooms by type
+        const roomTypeSelect = document.getElementById('room_type');
+        if (roomTypeSelect) {
+            roomTypeSelect.addEventListener('change', function() {
+                const selectedType = this.value;
+                const roomCards = document.querySelectorAll('.room-card');
+                
+                if (selectedType === '') {
+                    // Show all rooms
+                    roomCards.forEach(card => {
+                        card.style.display = 'block';
+                    });
+                } else {
+                    // Show only selected room type
+                    roomCards.forEach(card => {
+                        if (card.id === 'room-' + selectedType) {
+                            card.style.display = 'block';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                }
+            });
+        }
+        
+        // Handle availability form submission
+        const availabilityForm = document.getElementById('availability-form');
+        if (availabilityForm) {
+            availabilityForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(this);
+                const roomTypeId = formData.get('room_type');
+                const checkIn = formData.get('check_in');
+                const checkOut = formData.get('check_out');
+                
+                // Check if dates are valid
+                if (!checkIn || !checkOut || new Date(checkIn) >= new Date(checkOut)) {
+                    showAlert('danger', 'Please select valid check-in and check-out dates.');
+                    return;
+                }
+                
+                // Set the room type ID if selected
+                document.querySelector('input[name="room_type_id"]').value = roomTypeId;
+                
+                // Display loading indicator
+                const resultsContainer = document.getElementById('availability-results');
+                if (resultsContainer) {
+                    resultsContainer.innerHTML = '<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div><p class="mt-2">Checking availability...</p></div>';
+                }
+                
+                // Check availability via AJAX
+                fetch('/api/check_availability', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ 
+                        room_type_id: roomTypeId || "1", // Default to room type 1 if not specified
+                        check_in: checkIn,
+                        check_out: checkOut
+                    }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Clear any existing alerts
+                    document.getElementById('alert-placeholder').innerHTML = '';
+                    
+                    if (!resultsContainer) return;
+                    
+                    let html = '';
+                    
+                    if (data.available) {
+                        showAlert('success', `Great! We have ${data.room_count} rooms available for your selected dates.`);
+                        
+                        // Display available rooms
+                        if (data.available_rooms && data.available_rooms.length > 0) {
+                            html += `<div class="mt-3">
+                                <h6>Available Rooms:</h6>
+                                <ul class="list-group">`;
+                            
+                            data.available_rooms.forEach(room => {
+                                html += `<li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>Room ${room.number}</strong><br>
+                                        <small class="text-muted">Floor ${room.floor} | ${room.capacity} Guests</small>
+                                    </div>
+                                    <a href="/book-room/${room.id}?check_in=${checkIn}&check_out=${checkOut}" class="btn btn-sm btn-primary">Book Now</a>
+                                </li>`;
+                            });
+                            
+                            html += `</ul></div>`;
+                        }
+                        
+                        // Show booked rooms if any exist
+                        if (data.booked_rooms && data.booked_rooms.length > 0) {
+                            html += `<div class="mt-3">
+                                <h6>Currently Booked Rooms:</h6>
+                                <ul class="list-group">`;
+                            
+                            data.booked_rooms.forEach(room => {
+                                html += `<li class="list-group-item list-group-item-secondary d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>Room ${room.number}</strong><br>
+                                        <small class="text-muted">Floor ${room.floor} | ${room.capacity} Guests</small>
+                                    </div>
+                                    <span class="badge bg-secondary">Booked</span>
+                                </li>`;
+                            });
+                            
+                            html += `</ul></div>`;
+                        }
+                        
+                        // Show pending rooms if any exist
+                        if (data.pending_rooms && data.pending_rooms.length > 0) {
+                            html += `<div class="mt-3">
+                                <h6>Pending Reservation Rooms:</h6>
+                                <ul class="list-group">`;
+                            
+                            data.pending_rooms.forEach(room => {
+                                html += `<li class="list-group-item list-group-item-warning d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>Room ${room.number}</strong><br>
+                                        <small class="text-muted">Floor ${room.floor} | ${room.capacity} Guests</small>
+                                    </div>
+                                    <span class="badge bg-warning text-dark">Pending</span>
+                                </li>`;
+                            });
+                            
+                            html += `</ul></div>`;
+                        }
+                    } else {
+                        showAlert('warning', 'Sorry, no rooms are available for the selected dates. Please try different dates or room types.');
+                        
+                        // Still show the booked/pending rooms for information
+                        if (data.booked_rooms && data.booked_rooms.length > 0) {
+                            html += `<div class="mt-3">
+                                <h6>Currently Booked Rooms:</h6>
+                                <ul class="list-group">`;
+                            
+                            data.booked_rooms.forEach(room => {
+                                html += `<li class="list-group-item list-group-item-secondary d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>Room ${room.number}</strong><br>
+                                        <small class="text-muted">Floor ${room.floor} | ${room.capacity} Guests</small>
+                                    </div>
+                                    <span class="badge bg-secondary">Booked</span>
+                                </li>`;
+                            });
+                            
+                            html += `</ul></div>`;
+                        }
+                        
+                        if (data.pending_rooms && data.pending_rooms.length > 0) {
+                            html += `<div class="mt-3">
+                                <h6>Pending Reservation Rooms:</h6>
+                                <ul class="list-group">`;
+                            
+                            data.pending_rooms.forEach(room => {
+                                html += `<li class="list-group-item list-group-item-warning d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>Room ${room.number}</strong><br>
+                                        <small class="text-muted">Floor ${room.floor} | ${room.capacity} Guests</small>
+                                    </div>
+                                    <span class="badge bg-warning text-dark">Pending</span>
+                                </li>`;
+                            });
+                            
+                            html += `</ul></div>`;
+                        }
+                    }
+                    
+                    resultsContainer.innerHTML = html;
+                })
+                .catch(error => {
+                    console.error('Error checking availability:', error);
+                    showAlert('danger', 'An error occurred while checking availability. Please try again.');
+                });
+            });
+        }
+        
+        // Function to show alert
+        function showAlert(type, message) {
+            const alertPlaceholder = document.getElementById('alert-placeholder');
+            if (!alertPlaceholder) return;
+            
+            // Clear previous alerts
+            alertPlaceholder.innerHTML = '';
+            
+            const wrapper = document.createElement('div');
+            wrapper.innerHTML = `
+                <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            `;
+            
+            alertPlaceholder.append(wrapper);
+        }
+    });
+</script>
+{% endblock %} 

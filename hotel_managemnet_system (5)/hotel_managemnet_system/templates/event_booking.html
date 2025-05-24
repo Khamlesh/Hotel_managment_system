@@ -1,0 +1,488 @@
+{% extends 'layout.html' %}
+
+{% block title %}Book Event - {{ event.Event_Name }}{% endblock %}
+
+{% block content %}
+<!-- Event Booking Banner -->
+<section class="page-banner">
+    <div class="banner-content">
+        <div class="container">
+            <h1 class="display-4 text-white fw-bold">Book Event</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb justify-content-center">
+                    <li class="breadcrumb-item"><a href="{{ url_for('index') }}" class="text-white">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('events') }}" class="text-white">Events</a></li>
+                    <li class="breadcrumb-item active text-white" aria-current="page">Book Event</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+</section>
+
+<!-- Event Booking Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card shadow mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="mb-0">Event Booking</h3>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="{{ url_for('book_event', event_id=event.Event_ID) }}">
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <h4>Event Information</h4>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label for="event_name" class="form-label">Event Name</label>
+                                    <input type="text" class="form-control" id="event_name" value="{{ event.Event_Name }}" readonly>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="event_date" class="form-label">Event Date</label>
+                                    <input type="text" class="form-control" id="event_date" value="{{ event.Event_Date.strftime('%B %d, %Y') }}" readonly>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label for="event_location" class="form-label">Location</label>
+                                    <input type="text" class="form-control" id="event_location" value="{{ event.Location }}" readonly>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="event_capacity" class="form-label">Available Capacity</label>
+                                    <input type="text" class="form-control" id="event_capacity" value="{{ event.Expected_Guests }} guests" readonly>
+                                </div>
+                                
+                                <div class="col-12">
+                                    <hr>
+                                    <h4>Your Information</h4>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label for="first_name" class="form-label">First Name</label>
+                                    <input type="text" class="form-control" id="first_name" name="first_name" value="{{ current_user.First_Name }}" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="last_name" class="form-label">Last Name</label>
+                                    <input type="text" class="form-control" id="last_name" name="last_name" value="{{ current_user.Last_Name }}" required>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="email" name="email" value="{{ current_user.Email }}" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="phone" class="form-label">Phone Number</label>
+                                    <input type="tel" class="form-control" id="phone" name="phone" value="{{ current_user.Contact_Number }}" required>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label for="num_attendees" class="form-label">Number of Attendees</label>
+                                    <select class="form-select" id="num_attendees" name="num_attendees" required>
+                                        <option value="">Select</option>
+                                        <option value="1">1</option>
+                                        <option value="2" selected>2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                        <option value="6">6</option>
+                                        <option value="7">7</option>
+                                        <option value="8">8</option>
+                                        <option value="9">9</option>
+                                        <option value="10">10</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="discount_code" class="form-label">Discount Code (if any)</label>
+                                    <input type="text" class="form-control" id="discount_code" name="discount_code">
+                                </div>
+                                
+                                <div class="col-12">
+                                    <label for="special_requests" class="form-label">Special Requests</label>
+                                    <textarea class="form-control" id="special_requests" name="special_requests" rows="3" placeholder="Let us know if you have any special requests or requirements..."></textarea>
+                                </div>
+                                
+                                <div class="col-12">
+                                    <hr>
+                                    <h4>Payment Information</h4>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label for="payment_method" class="form-label">Payment Method</label>
+                                    <select class="form-select" id="payment_method" name="payment_method" required>
+                                        <option value="">Select</option>
+                                        <option value="Credit Card">Credit Card</option>
+                                        <option value="Debit Card">Debit Card</option>
+                                        <option value="PayPal">PayPal</option>
+                                        <option value="Bank Transfer">Bank Transfer</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="col-12 payment-details credit-card-details">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label for="card_number" class="form-label">Card Number</label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" id="card_number" name="card_number" placeholder="XXXX XXXX XXXX XXXX">
+                                                <button class="btn btn-outline-secondary toggle-visibility" type="button" data-target="card_number">
+                                                    <i class="bi bi-eye"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="card_name" class="form-label">Name on Card</label>
+                                            <input type="text" class="form-control" id="card_name" name="card_name">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="expiry_date" class="form-label">Expiry Date</label>
+                                            <input type="text" class="form-control" id="expiry_date" name="expiry_date" placeholder="MM/YY">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="cvv" class="form-label">CVV</label>
+                                            <div class="input-group">
+                                                <input type="password" class="form-control" id="cvv" name="cvv" placeholder="XXX">
+                                                <button class="btn btn-outline-secondary toggle-visibility" type="button" data-target="cvv">
+                                                    <i class="bi bi-eye"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-12">
+                                    <hr>
+                                    <h4>Terms and Conditions</h4>
+                                </div>
+                                
+                                <div class="col-12">
+                                    <div class="form-check mt-3">
+                                        <input class="form-check-input" type="checkbox" id="terms_agree" name="terms_agree" required>
+                                        <label class="form-check-label" for="terms_agree">
+                                            I agree to the <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">terms and conditions</a>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-12">
+                                    <div id="alert-placeholder"></div>
+                                </div>
+                                
+                                <div class="col-12">
+                                    <button type="submit" class="btn btn-primary btn-lg">Book Event</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="sticky-top" style="top: 20px;">
+                    <div class="card shadow mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h4 class="mb-0">Event Summary</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-3">
+                                {% if event.Event_Name == 'Wine Tasting' %}
+                                <img src="https://images.unsplash.com/photo-1423483641154-5411ec9c0ddf?q=80&w=1470&auto=format&fit=crop" class="img-thumbnail me-3" style="width: 80px; height: 80px; object-fit: cover;" alt="Wine Tasting">
+                                {% elif event.Event_Name == 'Live Music' %}
+                                <img src="https://images.unsplash.com/photo-1506157786151-b8491531f063?q=80&w=2070&auto=format&fit=crop" class="img-thumbnail me-3" style="width: 80px; height: 80px; object-fit: cover;" alt="Live Music">
+                                {% elif event.Event_Name == 'Cooking Class' %}
+                                <img src="https://images.unsplash.com/photo-1507048331197-7d4ac70811cf?q=80&w=1374&auto=format&fit=crop" class="img-thumbnail me-3" style="width: 80px; height: 80px; object-fit: cover;" alt="Cooking Class">
+                                {% elif event.Event_Name == 'Yoga Session' %}
+                                <img src="https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?q=80&w=1470&auto=format&fit=crop" class="img-thumbnail me-3" style="width: 80px; height: 80px; object-fit: cover;" alt="Yoga Session">
+                                {% elif event.Event_Name == 'Cultural Dance Night' %}
+                                <img src="https://images.unsplash.com/photo-1545224144-b38cd309f1c6?q=80&w=1470&auto=format&fit=crop" class="img-thumbnail me-3" style="width: 80px; height: 80px; object-fit: cover;" alt="Cultural Dance Night">
+                                {% elif event.Event_Name == 'Cocktail Masterclass' %}
+                                <img src="https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=1470&auto=format&fit=crop" class="img-thumbnail me-3" style="width: 80px; height: 80px; object-fit: cover;" alt="Cocktail Masterclass">
+                                {% elif event.Event_Name == 'Movie Night Under Stars' %}
+                                <img src="https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=1470&auto=format&fit=crop" class="img-thumbnail me-3" style="width: 80px; height: 80px; object-fit: cover;" alt="Movie Night">
+                                {% elif event.Event_Name == 'Art Exhibition' %}
+                                <img src="https://images.unsplash.com/photo-1531259683007-016a7b628fc3?q=80&w=1374&auto=format&fit=crop" class="img-thumbnail me-3" style="width: 80px; height: 80px; object-fit: cover;" alt="Art Exhibition">
+                                {% elif event.Event_Name == 'Gourmet Food Festival' %}
+                                <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=1374&auto=format&fit=crop" class="img-thumbnail me-3" style="width: 80px; height: 80px; object-fit: cover;" alt="Food Festival">
+                                {% elif event.Event_Name == 'Salsa Dancing Night' %}
+                                <img src="https://images.unsplash.com/photo-1545128485-c400e7702796?q=80&w=1470&auto=format&fit=crop" class="img-thumbnail me-3" style="width: 80px; height: 80px; object-fit: cover;" alt="Salsa Dancing">
+                                {% else %}
+                                <img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=1470&auto=format&fit=crop" class="img-thumbnail me-3" style="width: 80px; height: 80px; object-fit: cover;" alt="{{ event.Event_Name }}">
+                                {% endif %}
+                                <div>
+                                    <h5 class="mb-0">{{ event.Event_Name }}</h5>
+                                    <p class="text-muted mb-0">{{ event.Event_Date.strftime('%B %d, %Y') }}</p>
+                                </div>
+                            </div>
+                            
+                            <hr>
+                            
+                            <div class="event-details">
+                                <div class="row mb-2">
+                                    <div class="col-6 text-muted">Location:</div>
+                                    <div class="col-6 text-end">{{ event.Location }}</div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-6 text-muted">Time:</div>
+                                    <div class="col-6 text-end">19:00 - 22:00</div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-6 text-muted">Capacity:</div>
+                                    <div class="col-6 text-end">{{ event.Expected_Guests }} Persons</div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-6 text-muted">Price per Person:</div>
+                                    <div class="col-6 text-end">₹{{ event_price }}</div>
+                                </div>
+                            </div>
+                            
+                            <hr>
+                            
+                            <div id="price-calculation">
+                                <div class="row mb-2">
+                                    <div class="col-6 text-muted">Attendees:</div>
+                                    <div class="col-6 text-end"><span id="total-attendees">2</span> Persons</div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-6 text-muted">Event Total:</div>
+                                    <div class="col-6 text-end" id="event-total">₹{{ event_price * 2 }}</div>
+                                </div>
+                                <div class="row mb-2" id="discount-row" style="display: none;">
+                                    <div class="col-6 text-muted">Discount:</div>
+                                    <div class="col-6 text-end text-success" id="discount-amount">-₹0.00</div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-6 text-muted">Taxes & Fees:</div>
+                                    <div class="col-6 text-end" id="taxes-fees">₹{{ (event_price * 2 * 0.10)|round(2) }}</div>
+                                </div>
+                                <hr>
+                                <div class="row mb-2">
+                                    <div class="col-6"><strong>Total:</strong></div>
+                                    <div class="col-6 text-end"><strong id="final-total">₹{{ (event_price * 2 * 1.10)|round(2) }}</strong></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card shadow">
+                        <div class="card-body">
+                            <h5>Event Policy</h5>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check-circle text-success me-2"></i> Free cancellation up to 48 hours before the event</li>
+                                <li><i class="fas fa-check-circle text-success me-2"></i> Event check-in: 30 minutes before start time</li>
+                                <li><i class="fas fa-check-circle text-success me-2"></i> No outside food or drinks allowed</li>
+                                <li><i class="fas fa-check-circle text-success me-2"></i> Smart casual dress code</li>
+                                <li><i class="fas fa-info-circle text-primary me-2"></i> Event times and details subject to change</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Terms and Conditions Modal -->
+<div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="termsModalLabel">Terms and Conditions</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h6>Event Booking Terms</h6>
+                <p>By booking an event at Luxury Hotel, you agree to the following terms and conditions:</p>
+                <ol>
+                    <li><strong>Booking:</strong> A valid credit card is required to secure your event booking.</li>
+                    <li><strong>Cancellation Policy:</strong> Free cancellation up to 48 hours before the event. Cancellations made less than 48 hours before the event are subject to a 50% charge.</li>
+                    <li><strong>Check-in:</strong> Please arrive 30 minutes before the event start time for registration.</li>
+                    <li><strong>Payment:</strong> The total amount due will be charged to your credit card upon confirmation of booking.</li>
+                    <li><strong>Damages:</strong> You are responsible for any damages caused to the venue or equipment during the event.</li>
+                    <li><strong>Event Policies:</strong> You agree to abide by all event policies, including dress code and outside food/beverage restrictions.</li>
+                </ol>
+                
+                <h6>Privacy Policy</h6>
+                <p>Luxury Hotel respects your privacy and is committed to protecting your personal data. The information collected during the booking process will be used solely for the purpose of managing your event registration.</p>
+                
+                <h6>Disclaimer</h6>
+                <p>Luxury Hotel reserves the right to modify these terms and conditions at any time. The current version will be available on our website. Event details including time, venue, and program may be subject to change.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">I Agree</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-banner {
+        background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=1470&auto=format&fit=crop');
+        background-size: cover;
+        background-position: center;
+        height: 300px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    
+    .payment-details {
+        display: none;
+    }
+    
+    .card-header {
+        background-color: #0d6efd;
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Set up a global variable to store the event price - safely converting the Jinja variable to a JavaScript number
+    var EVENT_PRICE = parseFloat("{{ event_price|default(1000) }}");
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        var numAttendees = document.getElementById('num_attendees');
+        var discountCode = document.getElementById('discount_code');
+        var totalAttendees = document.getElementById('total-attendees');
+        var eventTotal = document.getElementById('event-total');
+        var discountRow = document.getElementById('discount-row');
+        var discountAmount = document.getElementById('discount-amount');
+        var taxesFees = document.getElementById('taxes-fees');
+        var finalTotal = document.getElementById('final-total');
+        var paymentMethod = document.getElementById('payment_method');
+        var creditCardDetails = document.querySelector('.credit-card-details');
+        
+        // Update pricing when number of attendees changes
+        if (numAttendees) {
+            numAttendees.addEventListener('change', function() {
+                updatePriceCalculation();
+            });
+        }
+        
+        // Handle discount code
+        if (discountCode) {
+            discountCode.addEventListener('blur', function() {
+                updatePriceCalculation();
+            });
+        }
+        
+        // Show/hide payment details based on payment method
+        if (paymentMethod) {
+            paymentMethod.addEventListener('change', function() {
+                if (this.value === 'Credit Card' || this.value === 'Debit Card') {
+                    creditCardDetails.style.display = 'block';
+                } else {
+                    creditCardDetails.style.display = 'none';
+                }
+            });
+        }
+        
+        // Initialize payment details display as hidden
+        if (creditCardDetails) {
+            creditCardDetails.style.display = 'none';
+        }
+
+        // Toggle password/sensitive field visibility
+        const toggleButtons = document.querySelectorAll('.toggle-visibility');
+        if (toggleButtons) {
+            toggleButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const targetId = this.getAttribute('data-target');
+                    const inputField = document.getElementById(targetId);
+                    
+                    if (inputField) {
+                        // Toggle input type between password and text for CVV field
+                        if (targetId === 'cvv') {
+                            if (inputField.type === 'password') {
+                                inputField.type = 'text';
+                                this.innerHTML = '<i class="bi bi-eye-slash"></i>';
+                            } else {
+                                inputField.type = 'password';
+                                this.innerHTML = '<i class="bi bi-eye"></i>';
+                            }
+                        } 
+                        // For card number, we'll apply masking/unmasking
+                        else if (targetId === 'card_number') {
+                            if (this.classList.contains('showing')) {
+                                // Return to masked state
+                                this.classList.remove('showing');
+                                this.innerHTML = '<i class="bi bi-eye"></i>';
+                            } else {
+                                // Show unmasked state
+                                this.classList.add('showing');
+                                this.innerHTML = '<i class="bi bi-eye-slash"></i>';
+                            }
+                        }
+                    }
+                });
+            });
+        }
+        
+        // Update price calculation
+        function updatePriceCalculation() {
+            // Ensure we have the DOM elements before proceeding
+            if (!numAttendees || !totalAttendees || !eventTotal || !taxesFees || !finalTotal) {
+                console.log("Some required DOM elements missing");
+                return;
+            }
+
+            // Get number of attendees, defaulting to 2 if invalid
+            var attendees = parseInt(numAttendees.value) || 2;
+            if (totalAttendees) totalAttendees.textContent = attendees;
+            
+            // Calculate event total (use isNaN check to prevent calculation errors)
+            var eventTotalPrice = !isNaN(EVENT_PRICE) ? EVENT_PRICE * attendees : 0;
+            if (eventTotal) eventTotal.textContent = '₹' + eventTotalPrice.toFixed(2);
+            
+            // Calculate taxes (example: 10% tax)
+            var taxRate = 0.10;
+            var taxAmount = eventTotalPrice * taxRate;
+            if (taxesFees) taxesFees.textContent = '₹' + taxAmount.toFixed(2);
+            
+            // Apply discount if valid
+            var discountApplied = 0;
+            var discountPercentage = 0;
+            
+            if(discountCode && discountCode.value && discountCode.value.trim() !== '') {
+                // Get the code and check validity
+                var code = discountCode.value.toUpperCase();
+                
+                if(code === 'EVENT20') {
+                    discountPercentage = 20;
+                } else if(code === 'WELCOME10') {
+                    discountPercentage = 10;
+                } else if(code === 'LOYALTY15') {
+                    discountPercentage = 15;
+                } else if(code === 'GROUP30' && attendees >= 5) {
+                    discountPercentage = 30;
+                }
+                
+                if(discountPercentage > 0 && discountRow && discountAmount) {
+                    discountApplied = eventTotalPrice * (discountPercentage / 100);
+                    discountAmount.textContent = '-₹' + discountApplied.toFixed(2);
+                    discountRow.style.display = '';
+                } else if (discountRow) {
+                    // Invalid discount code
+                    discountRow.style.display = 'none';
+                }
+            } else if (discountRow) {
+                // No discount code
+                discountRow.style.display = 'none';
+            }
+            
+            // Calculate final total
+            var total = eventTotalPrice + taxAmount - discountApplied;
+            if (finalTotal) finalTotal.textContent = '₹' + total.toFixed(2);
+        }
+        
+        // Initialize price calculation on page load
+        updatePriceCalculation();
+    });
+</script>
+{% endblock %} 

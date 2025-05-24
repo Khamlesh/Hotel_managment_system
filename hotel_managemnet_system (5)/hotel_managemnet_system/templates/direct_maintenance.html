@@ -1,0 +1,121 @@
+{% extends "layout.html" %}
+
+{% block title %}Report Maintenance Issue{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Report Maintenance Issue</h3>
+                </div>
+                <div class="card-body">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                    
+                    <div class="alert alert-info" role="alert">
+                        <i class="fas fa-info-circle me-2"></i> Use this form to report a maintenance issue for any room. Staff will review and respond to your request.
+                    </div>
+
+                    <form method="POST" action="{{ url_for('direct_maintenance') }}" class="needs-validation" novalidate>
+                        <div class="mb-4">
+                            <label for="room_number" class="form-label">Room Number</label>
+                            <select class="form-select" id="room_number" name="room_number" required>
+                                <option value="" selected disabled>Select a room number</option>
+                                {% for room in rooms %}
+                                <option value="{{ room.Room_Number }}">
+                                    Room {{ room.Room_Number }} ({{ room.room_type.Type_Name }}) - Floor {{ room.Floor_Number }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <div class="invalid-feedback">Please select a room number.</div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="issue_category" class="form-label">Issue Category</label>
+                            <select class="form-select" id="issue_category" name="issue_category" required>
+                                <option value="" selected disabled>Select an issue category</option>
+                                <option value="Plumbing">Plumbing (Toilet, Shower, Sink)</option>
+                                <option value="Electrical">Electrical (Lights, Power Outlets)</option>
+                                <option value="HVAC">HVAC (Air Conditioning, Heating)</option>
+                                <option value="Furniture">Furniture (Bed, Chair, Table)</option>
+                                <option value="Appliance">Appliance (TV, Refrigerator, Safe)</option>
+                                <option value="Housekeeping">Housekeeping (Cleaning, Linens)</option>
+                                <option value="Internet">Internet / Wi-Fi</option>
+                                <option value="Noise">Noise Issue</option>
+                                <option value="Other">Other</option>
+                            </select>
+                            <div class="invalid-feedback">Please select an issue category.</div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="issue_description" class="form-label">Issue Description</label>
+                            <textarea class="form-control" id="issue_description" name="issue_description" rows="5" placeholder="Please provide detailed information about the issue..." required></textarea>
+                            <div class="invalid-feedback">Please describe the issue.</div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="priority" class="form-label">Priority Level</label>
+                            <select class="form-select" id="priority" name="priority" required>
+                                <option value="Low">Low - Not urgent, can be fixed at convenience</option>
+                                <option value="Medium" selected>Medium - Please fix during the day</option>
+                                <option value="High">High - Requires prompt attention</option>
+                                <option value="Emergency">Emergency - Immediate attention required</option>
+                            </select>
+                            <div class="invalid-feedback">Please select a priority level.</div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Submit Maintenance Request</button>
+                            <a href="{{ url_for('maintenance_history') }}" class="btn btn-outline-secondary">View Previous Requests</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Form validation
+        const form = document.querySelector('.needs-validation');
+        
+        if (form) {
+            form.addEventListener('submit', function(event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                
+                form.classList.add('was-validated');
+            });
+        }
+        
+        // Additional behavior for "Other" category
+        const issueCategory = document.getElementById('issue_category');
+        const issueDescription = document.getElementById('issue_description');
+        
+        if (issueCategory && issueDescription) {
+            issueCategory.addEventListener('change', function() {
+                if (this.value === 'Other') {
+                    issueDescription.placeholder = "Please specify the issue type and provide detailed information...";
+                } else {
+                    issueDescription.placeholder = "Please provide detailed information about the issue...";
+                }
+            });
+        }
+    });
+</script>
+{% endblock %} 

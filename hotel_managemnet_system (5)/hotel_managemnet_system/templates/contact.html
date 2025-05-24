@@ -1,0 +1,170 @@
+{% extends "layout.html" %}
+
+{% block title %}Contact Us{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row mb-5">
+        <div class="col-md-6">
+            <h1 class="mb-4">Contact Us</h1>
+            <p class="lead">We'd love to hear from you</p>
+            <p>Our dedicated team is here to assist you with any questions, comments, or feedback you may have. Please use the contact form or reach out to one of our departments directly.</p>
+            
+            <div class="mt-4">
+                <h5>Hotel Address</h5>
+                <address>
+                    <i class="bi bi-geo-alt-fill me-2 text-primary"></i> 11th street Amazon Park<br>
+                    Saidapet , Chennai<br>
+                    India
+                </address>
+                
+                <div class="d-flex align-items-center mb-2">
+                    <i class="bi bi-telephone-fill me-2 text-primary"></i>
+                    <a href="tel:+91 9182518655" class="text-decoration-none">+91 9182518655</a>
+                </div>
+                
+                <div class="d-flex align-items-center mb-2">
+                    <i class="bi bi-envelope-fill me-2 text-primary"></i>
+                    <a href="mailto:info@arorahotel.com" class="text-decoration-none">info@arorahotel.com</a>
+                </div>
+            </div>
+            
+            <div class="mt-4">
+                <h5>Follow Us</h5>
+                <div class="social-links">
+                    <a href="#" class="btn btn-outline-primary me-2"><i class="bi bi-facebook"></i></a>
+                    <a href="#" class="btn btn-outline-primary me-2"><i class="bi bi-twitter"></i></a>
+                    <a href="#" class="btn btn-outline-primary me-2"><i class="bi bi-instagram"></i></a>
+                    <a href="#" class="btn btn-outline-primary"><i class="bi bi-linkedin"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-lg">
+                <div class="card-body p-4">
+                    <h5 class="card-title mb-4">Send Us a Message</h5>
+                    <form id="contactForm" class="needs-validation" novalidate>
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Your Name</label>
+                            <input type="text" class="form-control" id="name" required>
+                            <div class="invalid-feedback">Please enter your name.</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email Address</label>
+                            <input type="email" class="form-control" id="email" required>
+                            <div class="invalid-feedback">Please enter a valid email address.</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="subject" class="form-label">Subject</label>
+                            <input type="text" class="form-control" id="subject" required>
+                            <div class="invalid-feedback">Please enter a subject.</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="department" class="form-label">Department</label>
+                            <select class="form-select" id="department">
+                                <option value="">Select a department</option>
+                                <option value="1">Reservations</option>
+                                <option value="2">Guest Services</option>
+                                <option value="3">Housekeeping</option>
+                                <option value="4">Restaurant</option>
+                                <option value="5">Spa & Wellness</option>
+                                <option value="6">Events</option>
+                                {% for department in departments %}
+                                <option value="{{ department.Department_ID }}">{{ department.Department_Name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="message" class="form-label">Message</label>
+                            <textarea class="form-control" id="message" rows="5" required></textarea>
+                            <div class="invalid-feedback">Please enter your message.</div>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Send Message</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row my-5">
+        <div class="col-12">
+            <h3 class="mb-4">Our Departments</h3>
+        </div>
+        
+        {% for department in departments %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">{{ department.Department_Name }}</h5>
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="bi bi-telephone-fill me-2 text-primary"></i>
+                        <span>{{ department.Contact_Number }}</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="bi bi-envelope-fill me-2 text-primary"></i>
+                        <a href="mailto:{{ department.Email }}" class="text-decoration-none">{{ department.Email }}</a>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-geo-alt-fill me-2 text-primary"></i>
+                        <span>{{ department.Location }}</span>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-top-0">
+                    <small class="text-muted">Staff: {{ department.Number_of_Employees }} employees</small>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <div class="row my-5">
+        <div class="col-12">
+            <h3 class="mb-4">Find Us</h3>
+            <div class="map-container shadow-lg rounded">
+                <iframe 
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3887.2819237581224!2d80.220634!3d13.021505!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a526740b41e5da1%3A0xc5c7b04ba761da5c!2sSaidapet%2C%20Chennai%2C%20Tamil%20Nadu!5e0!3m2!1sen!2sin!4v1653386891076!5m2!1sen!2sin" 
+                    width="100%" 
+                    height="450" 
+                    style="border:0;" 
+                    allowfullscreen="" 
+                    loading="lazy" 
+                    referrerpolicy="no-referrer-when-downgrade">
+                </iframe>
+            </div>
+            <div class="text-center mt-3">
+                <a href="https://goo.gl/maps/QF2mJ8vZ6v7pANcx6" target="_blank" class="btn btn-outline-primary">
+                    <i class="bi bi-geo-alt me-2"></i>Get Directions
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Form validation
+        const contactForm = document.getElementById('contactForm');
+        if (contactForm) {
+            contactForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                if (this.checkValidity()) {
+                    // Here you would normally handle the form submission via AJAX
+                    // For demo purposes, show a success message
+                    alert('Thank you for your message. Our team will contact you shortly!');
+                    this.reset();
+                } else {
+                    this.classList.add('was-validated');
+                }
+            });
+        }
+    });
+</script>
+{% endblock %} 

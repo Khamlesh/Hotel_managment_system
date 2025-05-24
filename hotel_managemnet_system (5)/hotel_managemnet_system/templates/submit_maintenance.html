@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Submit Maintenance Request</h2>
+    <form method="POST" action="{{ url_for('submit_maintenance') }}">
+        <div class="mb-3">
+            <label for="room_id" class="form-label">Select Room</label>
+            <select class="form-select" id="room_id" name="room_id" required>
+                <option value="">Choose a room...</option>
+                {% for room in rooms %}
+                <option value="{{ room.Room_ID }}">Room {{ room.Room_Number }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="issue" class="form-label">Describe the Issue</label>
+            <textarea class="form-control" id="issue" name="issue" rows="3" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit Request</button>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

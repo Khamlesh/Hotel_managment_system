@@ -1,0 +1,110 @@
+{% extends "layout.html" %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="form-container">
+        <h2>Create an Account</h2>
+        <form method="POST" action="{{ url_for('register') }}" class="needs-validation" novalidate>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="first_name" class="form-label">First Name</label>
+                    <input type="text" class="form-control" id="first_name" name="first_name" required>
+                    <div class="invalid-feedback">Please enter your first name.</div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="last_name" class="form-label">Last Name</label>
+                    <input type="text" class="form-control" id="last_name" name="last_name" required>
+                    <div class="invalid-feedback">Please enter your last name.</div>
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <label for="email" class="form-label">Email Address</label>
+                <input type="email" class="form-control" id="email" name="email" required>
+                <div class="invalid-feedback">Please enter a valid email address.</div>
+            </div>
+            
+            <div class="mb-3">
+                <label for="contact_number" class="form-label">Mobile Number</label>
+                <input type="tel" class="form-control" id="contact_number" name="contact_number" required>
+                <div class="invalid-feedback">Please enter your mobile number.</div>
+            </div>
+            
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <div class="input-group">
+                    <input type="password" class="form-control" id="password" name="password" required 
+                           minlength="8" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}">
+                    <button class="btn btn-outline-secondary toggle-password" type="button" data-target="password">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                </div>
+                <div class="invalid-feedback">
+                    Password must be at least 8 characters and include uppercase, lowercase, and numbers.
+                </div>
+                <small class="form-text text-muted">
+                    Password must be at least 8 characters and include uppercase, lowercase, and numbers.
+                </small>
+            </div>
+            
+            <div class="mb-4">
+                <label for="password_confirm" class="form-label">Confirm Password</label>
+                <div class="input-group">
+                    <input type="password" class="form-control" id="password_confirm" name="password_confirm" required>
+                    <button class="btn btn-outline-secondary toggle-password" type="button" data-target="password_confirm">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                </div>
+                <div class="invalid-feedback">Passwords don't match.</div>
+            </div>
+            
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary">Register</button>
+            </div>
+            
+            <div class="text-center mt-3">
+                <p>Already have an account? <a href="{{ url_for('login') }}">Login here</a></p>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Password validation
+        const password = document.getElementById('password');
+        const confirmPassword = document.getElementById('password_confirm');
+        const form = document.querySelector('form');
+
+        form.addEventListener('submit', function(event) {
+            if (password.value !== confirmPassword.value) {
+                event.preventDefault();
+                alert('Passwords do not match!');
+                confirmPassword.focus();
+            }
+        });
+        
+        // Toggle password visibility
+        const toggleButtons = document.querySelectorAll('.toggle-password');
+        toggleButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const targetId = this.getAttribute('data-target');
+                const passwordInput = document.getElementById(targetId);
+                
+                // Toggle password visibility
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    this.innerHTML = '<i class="bi bi-eye-slash"></i>';
+                } else {
+                    passwordInput.type = 'password';
+                    this.innerHTML = '<i class="bi bi-eye"></i>';
+                }
+            });
+        });
+    });
+</script>
+{% endblock %} 

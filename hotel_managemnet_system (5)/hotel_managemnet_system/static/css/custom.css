@@ -1,0 +1,50 @@
+/* Enhanced Technician Workload Section */
+.technician-workload-section {
+    border: 2px solid #4e73df;
+    box-shadow: 0 0 15px rgba(78, 115, 223, 0.3);
+    animation: pulse-border 2s infinite;
+    margin-bottom: 30px;
+}
+
+@keyframes pulse-border {
+    0% { box-shadow: 0 0 15px rgba(78, 115, 223, 0.3); }
+    50% { box-shadow: 0 0 20px rgba(78, 115, 223, 0.6); }
+    100% { box-shadow: 0 0 15px rgba(78, 115, 223, 0.3); }
+}
+
+.technician-card {
+    transition: transform 0.3s;
+}
+
+.technician-card:hover {
+    transform: translateY(-5px);
+}
+
+.technician-avatar {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #4e73df;
+    color: white;
+    border-radius: 50%;
+    margin-right: 15px;
+}
+
+.workload-progress {
+    height: 8px;
+    margin: 10px 0;
+}
+
+.workload-data {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.technician-specialty {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed #e3e6f0;
+} 

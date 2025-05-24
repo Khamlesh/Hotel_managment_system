@@ -1,0 +1,63 @@
+{% extends "layout.html" %}
+
+{% block title %}Event Booking Successful{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-lg-6 mx-auto">
+            <div class="card shadow text-center">
+                <div class="card-body p-5">
+                    <div class="mb-4">
+                        <i class="fas fa-check-circle text-success fa-5x"></i>
+                    </div>
+                    <h1 class="display-5 fw-bold mb-3">Booking Successful!</h1>
+                    <p class="lead mb-2">Thank you for booking your event. Your booking has been confirmed.</p>
+                    
+                    <div class="alert alert-success mb-4">
+                        <h4 class="mb-0">Event Booking ID: #{{ event_booking.Event_Booking_ID }}</h4>
+                        <p class="small mt-2 mb-0">Please save this ID for future reference</p>
+                    </div>
+                    
+                    <div class="card bg-light mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Event Details</h5>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="row mb-2">
+                                <div class="col-6 text-start fw-bold">Event:</div>
+                                <div class="col-6 text-end">{{ event.Event_Name }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-6 text-start fw-bold">Date:</div>
+                                <div class="col-6 text-end">{{ event.Event_Date.strftime('%B %d, %Y') }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-6 text-start fw-bold">Location:</div>
+                                <div class="col-6 text-end">{{ event.Location }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-6 text-start fw-bold">Booking Date:</div>
+                                <div class="col-6 text-end">{{ event_booking.Booking_Date.strftime('%B %d, %Y') }}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-6 text-start fw-bold">Total Amount:</div>
+                                <div class="col-6 text-end text-primary fw-bold">₹{{ "%.2f"|format(event_booking.Total_Cost) }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <p>A confirmation email has been sent to <strong>{{ user.Email }}</strong>.</p>
+                    
+                    <p class="small text-muted mb-4">Please keep your booking information for reference. You can always view your booking details in your dashboard.</p>
+                    
+                    <div class="d-grid gap-3">
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-primary">Go to Dashboard</a>
+                        <a href="{{ url_for('events') }}" class="btn btn-outline-secondary">Browse More Events</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

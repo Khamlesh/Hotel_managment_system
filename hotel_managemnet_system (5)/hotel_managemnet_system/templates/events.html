@@ -1,0 +1,411 @@
+{% extends 'layout.html' %}
+
+{% block title %}Events & Activities{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero text-center position-relative">
+    <div class="hero-img" style="background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=1470&auto=format&fit=crop'); background-size: cover; background-position: center; height: 400px; display: flex; align-items: center; justify-content: center;">
+        <div class="container text-white">
+            <h1 class="display-4 fw-bold mb-4">Events & Activities</h1>
+            <p class="lead fs-4 mb-0">Discover our exclusive events and activities designed to make your stay memorable.</p>
+        </div>
+    </div>
+</section>
+
+<!-- Upcoming Events -->
+<section class="container my-5">
+    <h2 class="text-center mb-5 display-5 fw-bold">Upcoming Events</h2>
+    
+    {% if events %}
+    <div class="row">
+        {% for event in events %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100 event-card shadow">
+                <div class="card-header bg-primary text-white py-2">
+                    <h5 class="mb-0">{{ event.Event_Date.strftime('%B %d, %Y') }}</h5>
+                </div>
+                {% if event.Event_Name == 'Wine Tasting' %}
+                <img src="https://images.unsplash.com/photo-1423483641154-5411ec9c0ddf?q=80&w=1470&auto=format&fit=crop" class="card-img-top" alt="Wine Tasting">
+                {% elif event.Event_Name == 'Live Music' %}
+                <img src="https://images.unsplash.com/photo-1506157786151-b8491531f063?q=80&w=2070&auto=format&fit=crop" class="card-img-top" alt="Live Music">
+                {% elif event.Event_Name == 'Cooking Class' %}
+                <img src="https://images.unsplash.com/photo-1507048331197-7d4ac70811cf?q=80&w=1374&auto=format&fit=crop" class="card-img-top" alt="Cooking Class">
+                {% elif event.Event_Name == 'Yoga Session' %}
+                <img src="https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?q=80&w=1470&auto=format&fit=crop" class="card-img-top" alt="Yoga Session">
+                {% elif event.Event_Name == 'Cultural Dance Night' %}
+                <img src="https://i0.wp.com/www.tusktravel.com/blog/wp-content/uploads/2020/12/Traditional-Karnataka-Dance-Form.jpg?fit=1024%2C576&ssl=1" class="card-img-top" alt="Cultural Dance Night">
+                {% elif event.Event_Name == 'Cocktail Masterclass' %}
+                <img src="https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=1470&auto=format&fit=crop" class="card-img-top" alt="Cocktail Masterclass">
+                {% elif event.Event_Name == 'Movie Night Under Stars' %}
+                <img src="https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=1470&auto=format&fit=crop" class="card-img-top" alt="Movie Night">
+                {% elif event.Event_Name == 'Art Exhibition' %}
+                <img src="https://images.unsplash.com/photo-1531259683007-016a7b628fc3?q=80&w=1374&auto=format&fit=crop" class="card-img-top" alt="Art Exhibition">
+                {% elif event.Event_Name == 'Gourmet Food Festival' %}
+                <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=1374&auto=format&fit=crop" class="card-img-top" alt="Food Festival">
+                {% elif event.Event_Name == 'Salsa Dancing Night' %}
+                <img src="https://images.unsplash.com/photo-1545128485-c400e7702796?q=80&w=1470&auto=format&fit=crop" class="card-img-top" alt="Salsa Dancing">
+                {% else %}
+                <img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=1470&auto=format&fit=crop" class="card-img-top" alt="{{ event.Event_Name }}">
+                {% endif %}
+                <div class="card-body d-flex flex-column">
+                    <h4 class="card-title">{{ event.Event_Name }}</h4>
+                    <p class="card-text">{{ event.Description }}</p>
+                    <div class="mt-auto">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-map-marker-alt me-2"></i>{{ event.Location }}</span>
+                            <span><i class="fas fa-users me-2"></i>{{ event.Expected_Guests }} guests</span>
+                        </div>
+                        <hr>
+                        <div class="d-grid gap-2">
+                            <a href="{{ url_for('book_event', event_id=event.Event_ID) }}" class="btn btn-primary">Book Now</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <i class="fas fa-calendar-times fa-5x text-muted mb-3"></i>
+        <h4>No Upcoming Events</h4>
+        <p class="text-muted">Check back soon for new and exciting events!</p>
+    </div>
+    {% endif %}
+</section>
+
+<!-- Event Calendar -->
+<section class="bg-light py-5">
+    <div class="container">
+        <h2 class="text-center mb-4 display-5 fw-bold">Monthly Event Calendar</h2>
+        <div class="row">
+            <div class="col-lg-8 offset-lg-2">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">{{ now.strftime('%B %Y') }}</h5>
+                        <div>
+                            <button class="btn btn-sm btn-light me-2" id="prevMonth"><i class="fas fa-chevron-left"></i></button>
+                            <button class="btn btn-sm btn-light" id="nextMonth"><i class="fas fa-chevron-right"></i></button>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <table class="table table-bordered calendar-table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Sun</th>
+                                    <th>Mon</th>
+                                    <th>Tue</th>
+                                    <th>Wed</th>
+                                    <th>Thu</th>
+                                    <th>Fri</th>
+                                    <th>Sat</th>
+                                </tr>
+                            </thead>
+                            <tbody id="calendarBody">
+                                <!-- Calendar will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Regular Activities -->
+<section class="container my-5">
+    <h2 class="text-center mb-5 display-5 fw-bold">Regular Activities</h2>
+    <div class="row">
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card h-100 shadow">
+                <img src="https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?q=80&w=1470&auto=format&fit=crop" class="card-img-top activity-img" alt="Yoga">
+                <div class="card-body text-center">
+                    <h4 class="card-title">Morning Yoga</h4>
+                    <p class="card-text">Start your day with our refreshing yoga session at the poolside.</p>
+                    <p class="text-muted"><i class="far fa-clock me-2"></i>Every day, 7:00 AM - 8:00 AM</p>
+                </div>
+                <div class="card-footer bg-white border-top-0 text-center">
+                    <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#activityModal" data-activity="Morning Yoga">Reserve Spot</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card h-100 shadow">
+                <img src="https://images.unsplash.com/photo-1507048331197-7d4ac70811cf?q=80&w=1374&auto=format&fit=crop" class="card-img-top activity-img" alt="Cooking Class">
+                <div class="card-body text-center">
+                    <h4 class="card-title">Cooking Class</h4>
+                    <p class="card-text">Learn to prepare delicious local dishes with our expert chef.</p>
+                    <p class="text-muted"><i class="far fa-clock me-2"></i>Tuesday & Friday, 3:00 PM - 5:00 PM</p>
+                </div>
+                <div class="card-footer bg-white border-top-0 text-center">
+                    <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#activityModal" data-activity="Cooking Class">Reserve Spot</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card h-100 shadow">
+                <img src="https://images.unsplash.com/photo-1423483641154-5411ec9c0ddf?q=80&w=1470&auto=format&fit=crop" class="card-img-top activity-img" alt="Wine Tasting">
+                <div class="card-body text-center">
+                    <h4 class="card-title">Wine Tasting</h4>
+                    <p class="card-text">Sample a selection of fine wines curated by our sommelier.</p>
+                    <p class="text-muted"><i class="far fa-clock me-2"></i>Wednesday & Saturday, 6:00 PM - 7:30 PM</p>
+                </div>
+                <div class="card-footer bg-white border-top-0 text-center">
+                    <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#activityModal" data-activity="Wine Tasting">Reserve Spot</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card h-100 shadow">
+                <img src="https://images.unsplash.com/photo-1506157786151-b8491531f063?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" class="card-img-top activity-img" alt="Live Music">
+                <div class="card-body text-center">
+                    <h4 class="card-title">Live Music</h4>
+                    <p class="card-text">Enjoy soothing live music performances at our lounge.</p>
+                    <p class="text-muted"><i class="far fa-clock me-2"></i>Thursday - Sunday, 8:00 PM - 10:00 PM</p>
+                </div>
+                <div class="card-footer bg-white border-top-0 text-center">
+                    <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#activityModal" data-activity="Live Music">Reserve Spot</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Activity Booking Modal -->
+<div class="modal fade" id="activityModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Book Activity</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="activityBookingForm" class="needs-validation" novalidate>
+                    <div class="mb-3">
+                        <label for="activity_name" class="form-label">Activity</label>
+                        <input type="text" class="form-control" id="activity_name" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="activity_date" class="form-label">Date</label>
+                        <input type="date" class="form-control" id="activity_date" name="activity_date" required min="{{ now.strftime('%Y-%m-%d') }}">
+                        <div class="invalid-feedback">Please select a date.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="num_participants" class="form-label">Number of Participants</label>
+                        <select class="form-select" id="num_participants" name="num_participants" required>
+                            <option value="">Select</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                        </select>
+                        <div class="invalid-feedback">Please select the number of participants.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="special_requests" class="form-label">Special Requests</label>
+                        <textarea class="form-control" id="special_requests" name="special_requests" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirmActivityBooking">Confirm Booking</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .event-card {
+        transition: transform 0.3s ease;
+        overflow: hidden;
+    }
+    
+    .event-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .event-card .card-img-top {
+        height: 200px;
+        object-fit: cover;
+    }
+    
+    .activity-img {
+        height: 180px;
+        object-fit: cover;
+    }
+    
+    .calendar-table th, .calendar-table td {
+        text-align: center;
+        padding: 10px;
+        vertical-align: middle;
+    }
+    
+    .calendar-table td.event-day {
+        background-color: rgba(13, 110, 253, 0.1);
+        font-weight: bold;
+        position: relative;
+    }
+    
+    .calendar-table td.event-day::after {
+        content: '';
+        position: absolute;
+        bottom: 2px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 5px;
+        height: 5px;
+        background-color: #0d6efd;
+        border-radius: 50%;
+    }
+    
+    .calendar-table td.today {
+        background-color: rgba(25, 135, 84, 0.1);
+        border: 1px solid #198754;
+    }
+    
+    .calendar-table td:hover:not(.empty) {
+        background-color: rgba(13, 110, 253, 0.05);
+        cursor: pointer;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle activity booking modal
+        const activityModal = document.getElementById('activityModal');
+        if (activityModal) {
+            activityModal.addEventListener('show.bs.modal', function(event) {
+                const button = event.relatedTarget;
+                const activityName = button.getAttribute('data-activity');
+                document.getElementById('activity_name').value = activityName;
+                
+                // Set default date to today
+                const activityDate = document.getElementById('activity_date');
+                const today = new Date();
+                activityDate.value = today.toISOString().split('T')[0];
+            });
+            
+            // Handle booking confirmation
+            document.getElementById('confirmActivityBooking').addEventListener('click', function() {
+                const form = document.getElementById('activityBookingForm');
+                if (form.checkValidity()) {
+                    // In a real implementation, you'd submit this data to the server
+                    alert('Activity booking confirmed! We look forward to your participation.');
+                    const modal = bootstrap.Modal.getInstance(activityModal);
+                    modal.hide();
+                } else {
+                    form.classList.add('was-validated');
+                }
+            });
+        }
+        
+        // Generate calendar
+        generateCalendar();
+        
+        // Previous month button
+        document.getElementById('prevMonth').addEventListener('click', function() {
+            const currentMonth = document.querySelector('.card-header h5').textContent;
+            const date = new Date(currentMonth);
+            date.setMonth(date.getMonth() - 1);
+            document.querySelector('.card-header h5').textContent = date.toLocaleString('default', { month: 'long', year: 'numeric' });
+            generateCalendar(date);
+        });
+        
+        // Next month button
+        document.getElementById('nextMonth').addEventListener('click', function() {
+            const currentMonth = document.querySelector('.card-header h5').textContent;
+            const date = new Date(currentMonth);
+            date.setMonth(date.getMonth() + 1);
+            document.querySelector('.card-header h5').textContent = date.toLocaleString('default', { month: 'long', year: 'numeric' });
+            generateCalendar(date);
+        });
+        
+        // Generate calendar
+        function generateCalendar(date) {
+            if (!date) {
+                date = new Date();
+            }
+            
+            const year = date.getFullYear();
+            const month = date.getMonth();
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const daysInMonth = lastDay.getDate();
+            const startingDay = firstDay.getDay();
+            
+            const calendarBody = document.getElementById('calendarBody');
+            calendarBody.innerHTML = '';
+            
+            let day = 1;
+            const today = new Date();
+            const isCurrentMonth = today.getMonth() === month && today.getFullYear() === year;
+            
+            // Event dates (example)
+            const eventDates = [
+                {day: 5, event: 'Wine Tasting'},
+                {day: 12, event: 'Live Music'},
+                {day: 18, event: 'Cooking Class'},
+                {day: 25, event: 'Yoga Session'},
+                {day: 8, event: 'Cultural Dance Night'},
+                {day: 15, event: 'Cocktail Masterclass'},
+                {day: 10, event: 'Movie Night Under Stars'},
+                {day: 30, event: 'Art Exhibition'},
+                {day: 22, event: 'Gourmet Food Festival'},
+                {day: 3, event: 'Salsa Dancing Night'}
+            ];
+            
+            for (let i = 0; i < 6; i++) {
+                const row = document.createElement('tr');
+                
+                for (let j = 0; j < 7; j++) {
+                    const cell = document.createElement('td');
+                    
+                    if (i === 0 && j < startingDay) {
+                        cell.classList.add('empty');
+                    } else if (day > daysInMonth) {
+                        cell.classList.add('empty');
+                    } else {
+                        cell.textContent = day;
+                        
+                        // Check if it's today
+                        if (isCurrentMonth && day === today.getDate()) {
+                            cell.classList.add('today');
+                        }
+                        
+                        // Check if there's an event on this day
+                        const event = eventDates.find(e => e.day === day);
+                        if (event) {
+                            cell.classList.add('event-day');
+                            cell.setAttribute('data-bs-toggle', 'tooltip');
+                            cell.setAttribute('title', event.event);
+                        }
+                        
+                        day++;
+                    }
+                    
+                    row.appendChild(cell);
+                }
+                
+                calendarBody.appendChild(row);
+                
+                if (day > daysInMonth) {
+                    break;
+                }
+            }
+            
+            // Initialize tooltips for event days
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        }
+    });
+</script>
+{% endblock %} 

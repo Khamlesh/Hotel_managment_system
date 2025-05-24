@@ -1,0 +1,213 @@
+{% extends "layout.html" %}
+
+{% block title %}Feedback{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="form-container">
+        <h2>Share Your Experience</h2>
+        <p class="lead">We value your feedback to improve our services.</p>
+        
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Reservation Details</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-2">
+                    <div class="col-md-6 fw-bold">Check-in Date:</div>
+                    <div class="col-md-6">{{ reservation.Check_In_Date.strftime('%B %d, %Y') }}</div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-md-6 fw-bold">Check-out Date:</div>
+                    <div class="col-md-6">{{ reservation.Check_Out_Date.strftime('%B %d, %Y') }}</div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-md-6 fw-bold">Room:</div>
+                    <div class="col-md-6">{{ reservation.room.room_type.Type_Name }} - Room {{ reservation.room.Room_Number }}</div>
+                </div>
+            </div>
+        </div>
+        
+        <form method="POST" action="{{ url_for('submit_feedback', reservation_id=reservation.Reservation_ID) }}" class="needs-validation" novalidate>
+            <div class="mb-4">
+                <h5>Overall Rating</h5>
+                <div class="rating-container mb-3">
+                    <div class="stars">
+                        <i class="bi bi-star-fill rating-star" data-rating="1"></i>
+                        <i class="bi bi-star-fill rating-star" data-rating="2"></i>
+                        <i class="bi bi-star-fill rating-star" data-rating="3"></i>
+                        <i class="bi bi-star-fill rating-star" data-rating="4"></i>
+                        <i class="bi bi-star-fill rating-star" data-rating="5"></i>
+                    </div>
+                    <input type="hidden" name="rating" id="rating" value="0" required>
+                    <div class="rating-text mt-2">Click to rate</div>
+                    <div class="invalid-feedback">Please select a rating.</div>
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                <label for="comments" class="form-label">Your Comments</label>
+                <textarea class="form-control" id="comments" name="comments" rows="5" placeholder="Please share your experience with us..." required></textarea>
+                <div class="invalid-feedback">Please share your feedback with us.</div>
+            </div>
+            
+            <div class="mb-4">
+                <h5>Rate Our Services</h5>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Cleanliness</label>
+                        <div class="service-rating" data-service="cleanliness">
+                            <i class="bi bi-star-fill" data-rating="1"></i>
+                            <i class="bi bi-star-fill" data-rating="2"></i>
+                            <i class="bi bi-star-fill" data-rating="3"></i>
+                            <i class="bi bi-star-fill" data-rating="4"></i>
+                            <i class="bi bi-star-fill" data-rating="5"></i>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Staff Service</label>
+                        <div class="service-rating" data-service="staff">
+                            <i class="bi bi-star-fill" data-rating="1"></i>
+                            <i class="bi bi-star-fill" data-rating="2"></i>
+                            <i class="bi bi-star-fill" data-rating="3"></i>
+                            <i class="bi bi-star-fill" data-rating="4"></i>
+                            <i class="bi bi-star-fill" data-rating="5"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Comfort</label>
+                        <div class="service-rating" data-service="comfort">
+                            <i class="bi bi-star-fill" data-rating="1"></i>
+                            <i class="bi bi-star-fill" data-rating="2"></i>
+                            <i class="bi bi-star-fill" data-rating="3"></i>
+                            <i class="bi bi-star-fill" data-rating="4"></i>
+                            <i class="bi bi-star-fill" data-rating="5"></i>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Value for Money</label>
+                        <div class="service-rating" data-service="value">
+                            <i class="bi bi-star-fill" data-rating="1"></i>
+                            <i class="bi bi-star-fill" data-rating="2"></i>
+                            <i class="bi bi-star-fill" data-rating="3"></i>
+                            <i class="bi bi-star-fill" data-rating="4"></i>
+                            <i class="bi bi-star-fill" data-rating="5"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="contact_permission" name="contact_permission">
+                <label class="form-check-label" for="contact_permission">I consent to be contacted regarding my feedback</label>
+            </div>
+            
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary">Submit Feedback</button>
+            </div>
+        </form>
+        
+        <div class="text-center mt-4">
+            <p>Thank you for taking the time to share your experience with us.</p>
+            <p>Your feedback helps us improve our services for all our guests.</p>
+        </div>
+    </div>
+</div>
+
+<style>
+    .rating-container .stars {
+        display: flex;
+        gap: 0.5rem;
+        font-size: 2rem;
+    }
+    
+    .rating-star, .service-rating i {
+        color: #e0e0e0;
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+    
+    .rating-star:hover, .rating-star.active,
+    .service-rating i:hover, .service-rating i.active {
+        color: #ffc107;
+    }
+    
+    .service-rating {
+        display: flex;
+        gap: 0.25rem;
+        font-size: 1.25rem;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ratingStars = document.querySelectorAll('.rating-star');
+        const ratingInput = document.getElementById('rating');
+        const ratingText = document.querySelector('.rating-text');
+        
+        const ratingDescriptions = [
+            'Click to rate',
+            'Poor',
+            'Fair',
+            'Good',
+            'Very Good',
+            'Excellent'
+        ];
+        
+        function updateRating(rating) {
+            ratingInput.value = rating;
+            ratingText.textContent = ratingDescriptions[rating];
+            
+            ratingStars.forEach((star, index) => {
+                if (index < rating) {
+                    star.classList.add('active');
+                } else {
+                    star.classList.remove('active');
+                }
+            });
+        }
+        
+        ratingStars.forEach(star => {
+            star.addEventListener('click', function() {
+                const rating = parseInt(this.getAttribute('data-rating'));
+                updateRating(rating);
+            });
+        });
+        
+        // Service ratings
+        const serviceRatings = document.querySelectorAll('.service-rating');
+        serviceRatings.forEach(container => {
+            const stars = container.querySelectorAll('i');
+            
+            stars.forEach(star => {
+                star.addEventListener('click', function() {
+                    const rating = parseInt(this.getAttribute('data-rating'));
+                    const service = container.getAttribute('data-service');
+                    
+                    // Update hidden input or do whatever with the rating
+                    stars.forEach((s, index) => {
+                        if (index < rating) {
+                            s.classList.add('active');
+                        } else {
+                            s.classList.remove('active');
+                        }
+                    });
+                });
+            });
+        });
+        
+        // Form validation
+        const form = document.querySelector('form');
+        form.addEventListener('submit', function(event) {
+            if (ratingInput.value === '0') {
+                event.preventDefault();
+                ratingInput.setCustomValidity('Please select a rating');
+            } else {
+                ratingInput.setCustomValidity('');
+            }
+        });
+    });
+</script>
+{% endblock %} 

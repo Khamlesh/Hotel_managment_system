@@ -1,0 +1,182 @@
+{% extends "layout.html" %}
+
+{% block title %}Assign Technician{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h3 class="mb-0">Assign Technician to Maintenance Request #{{ maintenance.Maintenance_ID }}</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <!-- Maintenance Request Details -->
+                        <div class="col-md-6">
+                            <h5 class="border-bottom pb-2">Request Details</h5>
+                            <dl class="row">
+                                <dt class="col-sm-4">Room:</dt>
+                                <dd class="col-sm-8">
+                                    {% if maintenance.room %}
+                                    Room {{ maintenance.room.Room_Number }} ({{ maintenance.room.room_type.Type_Name }})
+                                    {% else %}
+                                    Unknown
+                                    {% endif %}
+                                </dd>
+                                
+                                <dt class="col-sm-4">Reported:</dt>
+                                <dd class="col-sm-8">{{ maintenance.Report_Date.strftime('%B %d, %Y') }}</dd>
+                                
+                                <dt class="col-sm-4">Priority:</dt>
+                                <dd class="col-sm-8">
+                                    {% set priority = get_priority_from_text(maintenance.Issue_Reported) %}
+                                    {% if priority == 'Emergency' %}
+                                    <span class="badge bg-danger">Emergency</span>
+                                    {% elif priority == 'High' %}
+                                    <span class="badge bg-warning">High</span>
+                                    {% elif priority == 'Medium' %}
+                                    <span class="badge bg-info">Medium</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">Low</span>
+                                    {% endif %}
+                                </dd>
+                            </dl>
+                        </div>
+                        
+                        <!-- AI Recommendation -->
+                        <div class="col-md-6">
+                            <div class="card bg-light">
+                                <div class="card-header">
+                                    <h5 class="mb-0"><i class="bi bi-lightbulb"></i> AI Recommendation</h5>
+                                </div>
+                                <div class="card-body">
+                                    {% if suggested_name %}
+                                    <p class="mb-1"><strong>Suggested Technician:</strong></p>
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px;">
+                                            <i class="bi bi-person"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0">{{ suggested_name }}</h6>
+                                            <small class="text-muted">{{ reason }}</small>
+                                            {% for staff in maintenance_staff %}
+                                                {% if staff.First_Name and staff.Last_Name and staff.First_Name + ' ' + staff.Last_Name == suggested_name %}
+                                                    <small class="d-block text-primary">{{ staff.Experience if staff.Experience else '' }} - {{ staff.Specialization if staff.Specialization else '' }}</small>
+                                                {% elif staff.get and staff.get('First_Name', '') + ' ' + staff.get('Last_Name', '') == suggested_name %}
+                                                    <small class="d-block text-primary">{{ staff.get('Experience', '') }} - {{ staff.get('Specialization', '') }}</small>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    <p class="mb-1"><strong>Estimated Cost:</strong></p>
+                                    <h5 class="text-primary">₹{{ "%.2f"|format(estimated_cost) }}</h5>
+                                    {% else %}
+                                    <p class="text-center text-muted">
+                                        <i class="bi bi-emoji-neutral fs-3 d-block mb-2"></i>
+                                        No automatic recommendation available
+                                    </p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Issue Description -->
+                    <div class="mb-4">
+                        <h5 class="border-bottom pb-2">Issue Description</h5>
+                        <div class="card">
+                            <div class="card-body">
+                                <p style="white-space: pre-line;">{{ maintenance.Issue_Reported }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Assignment Form -->
+                    <form method="POST" action="{{ url_for('assign_maintenance', maintenance_id=maintenance.Maintenance_ID) }}">
+                        <h5 class="border-bottom pb-2">Assign Technician</h5>
+                        
+                        <div class="mb-3">
+                            <label for="technician" class="form-label">Select Technician</label>
+                            <select class="form-select" id="technician" name="technician" required>
+                                <option value="" selected disabled>Choose a technician</option>
+                                {% for staff in maintenance_staff %}
+                                {% if staff.First_Name and staff.Last_Name %}
+                                <option value="{{ staff.First_Name }} {{ staff.Last_Name }}" 
+                                    {% if suggested_name and staff.First_Name + ' ' + staff.Last_Name == suggested_name %}selected{% endif %}>
+                                    {{ staff.First_Name }} {{ staff.Last_Name }} - {{ staff.Role_Position }}
+                                    {% if staff.Experience or staff.Specialization %}({{ staff.Experience }}{% if staff.Experience and staff.Specialization %} - {% endif %}{{ staff.Specialization }}){% endif %}
+                                </option>
+                                {% elif staff.get %}
+                                <option value="{{ staff.get('First_Name', '') }} {{ staff.get('Last_Name', '') }}"
+                                    {% if suggested_name and staff.get('First_Name', '') + ' ' + staff.get('Last_Name', '') == suggested_name %}selected{% endif %}>
+                                    {{ staff.get('First_Name', '') }} {{ staff.get('Last_Name', '') }} - {{ staff.get('Role_Position', '') }}
+                                    {% if staff.get('Experience') or staff.get('Specialization') %}({{ staff.get('Experience', '') }}{% if staff.get('Experience') and staff.get('Specialization') %} - {% endif %}{{ staff.get('Specialization', '') }}){% endif %}
+                                </option>
+                                {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="estimated_cost" class="form-label">Estimated Repair Cost (₹)</label>
+                            <input type="number" class="form-control" id="estimated_cost" name="estimated_cost" 
+                                  min="0" step="0.01" value="{{ estimated_cost }}" required>
+                            <div class="form-text">Provide an estimated cost for this repair work</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="notes" class="form-label">Work Instructions/Notes</label>
+                            <textarea class="form-control" id="notes" name="notes" rows="3" placeholder="Add any specific instructions or notes for the technician..."></textarea>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('staff_portal') }}" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Back to Staff Portal
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle"></i> Assign & Start Work
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Schedule Automatic Completion -->
+                    <div class="mt-4">
+                        <h5 class="border-bottom pb-2">Schedule Automatic Completion</h5>
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <p class="text-muted"><i class="bi bi-info-circle"></i> Use this option when the customer has specified that maintenance can be performed anytime and you want to automatically mark it as complete after a certain period.</p>
+                                
+                                <form method="POST" action="{{ url_for('schedule_maintenance_completion', maintenance_id=maintenance.Maintenance_ID) }}">
+                                    <div class="mb-3">
+                                        <label for="hours" class="form-label">Complete After (hours)</label>
+                                        <select class="form-select" id="hours" name="hours">
+                                            <option value="1">1 hour</option>
+                                            <option value="2">2 hours</option>
+                                            <option value="4">4 hours</option>
+                                            <option value="8">8 hours</option>
+                                            <option value="12">12 hours</option>
+                                            <option value="24" selected>24 hours</option>
+                                            <option value="48">48 hours</option>
+                                            <option value="72">72 hours (3 days)</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="schedule_notes" class="form-label">Completion Notes</label>
+                                        <textarea class="form-control" id="schedule_notes" name="notes" rows="2" placeholder="Add notes about the scheduled completion..."></textarea>
+                                    </div>
+                                    
+                                    <button type="submit" class="btn btn-info">
+                                        <i class="bi bi-clock"></i> Schedule Automatic Completion
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

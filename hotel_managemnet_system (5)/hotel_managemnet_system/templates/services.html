@@ -1,0 +1,282 @@
+{% extends "layout.html" %}
+
+{% block title %}Hotel Services{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row mb-5">
+        <div class="col-12 text-center">
+            <h1 class="display-4">Our Premium Services</h1>
+            <p class="lead">Indulge in luxury with our curated selection of exclusive services</p>
+        </div>
+    </div>
+    
+    <div class="row mb-5">
+        {% for service in services %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow service-card">
+                <div class="service-img-container">
+                    {% if service.Service_Name == 'Room Service' %}
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS2SVWE73P-Ls1PxWrZdJV8IbjALtpSR3S1MA&s" class="card-img-top" alt="{{ service.Service_Name }}">
+                    {% elif service.Service_Name == 'Spa Treatment' %}
+                    <img src="https://images.unsplash.com/photo-1620733723572-11c53f73a416?q=80&w=1770&auto=format&fit=crop" class="card-img-top" alt="{{ service.Service_Name }}">
+                    {% elif service.Service_Name == 'Airport Shuttle' %}
+                    <img src="https://i0.wp.com/clairlimo.com/wp-content/uploads/2021/09/shutterstock_1776181712-2-scaled.jpg?fit=2560%2C1709&ssl=1" class="card-img-top" alt="{{ service.Service_Name }}">
+                    {% elif service.Service_Name == 'Laundry Service' %}
+                    <img src="https://cleanliving.in/view/images/sliders/washing.jpg" class="card-img-top" alt="{{ service.Service_Name }}">
+                    {% elif service.Service_Name == 'Guided Tours' %}
+                    <img src="https://www.exp1.com/blog/wp-content/uploads/sites/7/2020/12/Statue_0739-72dpi-1024x640.jpg" class="card-img-top" alt="{{ service.Service_Name }}">
+                    {% elif service.Service_Name == 'Fitness Center' %}
+                    <img src="https://images.unsplash.com/photo-1540497077202-7c8a3999166f?q=80&w=1770&auto=format&fit=crop" class="card-img-top" alt="{{ service.Service_Name }}">
+                    {% else %}
+                    <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1740&auto=format&fit=crop" class="card-img-top" alt="{{ service.Service_Name }}">
+                    {% endif %}
+                    <div class="service-status badge {% if service.Availability_Status == 'Available' %}bg-success{% else %}bg-danger{% endif %}">
+                        {{ service.Availability_Status }}
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ service.Service_Name }}</h5>
+                    <p class="card-text">{{ service.Description }}</p>
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <span class="price">₹{{ "%.2f"|format(service.Price) }}</span>
+                        <span class="duration">
+                            <i class="bi bi-clock me-1"></i>
+                            {{ service.Duration.strftime('%H:%M') }}
+                        </span>
+                    </div>
+                </div>
+                <div class="card-footer bg-white border-0">
+                    <div class="d-grid">
+                        <a href="#" class="btn btn-outline-primary book-service-btn" data-bs-toggle="modal" data-bs-target="#serviceModal" data-service-id="{{ service.Service_ID }}" data-service-name="{{ service.Service_Name }}">Book Now</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <div class="row my-5">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-body p-4">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h3>Special Packages</h3>
+                            <p>Enhance your stay with our exclusive service packages designed to provide the ultimate luxury experience.</p>
+                            <div class="mt-4">
+                                <div class="card mb-3">
+                                    <div class="row g-0">
+                                        <div class="col-md-4">
+                                            <img src="https://amicaleholidays.com/wp-content/uploads/2018/07/AI.jpg" class="img-fluid rounded-start h-100" alt="Honeymoon Package" style="object-fit: cover;">
+                                        </div>
+                                        <div class="col-md-8">
+                                            <div class="card-body">
+                                                <h5 class="card-title">Honeymoon Package</h5>
+                                                <p class="card-text">Includes spa treatments, romantic dinner, and suite upgrade.</p>
+                                                <p class="card-text text-primary fw-bold">₹20000.00 / 3D 2N</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card mb-3">
+                                    <div class="row g-0">
+                                        <div class="col-md-4">
+                                            <img src="https://images.unsplash.com/photo-1520333789090-1afc82db536a?q=80&w=1770&auto=format&fit=crop" class="img-fluid rounded-start h-100" alt="Business Traveler" style="object-fit: cover;">
+                                        </div>
+                                        <div class="col-md-8">
+                                            <div class="card-body">
+                                                <h5 class="card-title">Business Traveler</h5>
+                                                <p class="card-text">Includes airport transfers, laundry service, and business center access.</p>
+                                                <p class="card-text text-primary fw-bold">₹12000.00 /night</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <div class="row g-0">
+                                        <div class="col-md-4">
+                                            <img src="https://www.holidaymonk.com/wp-content/uploads/2019/03/WELLNESS-RETREATS-IN-INDIA.jpg" class="img-fluid rounded-start h-100" alt="Wellness Retreat" style="object-fit: cover;">
+                                        </div>
+                                        <div class="col-md-8">
+                                            <div class="card-body">
+                                                <h5 class="card-title">Wellness Retreat</h5>
+                                                <p class="card-text">Includes daily spa treatments, fitness sessions, and healthy meals.</p>
+                                                <p class="card-text text-primary fw-bold">₹8000.00 /night</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h3>Custom Service Requests</h3>
+                            <p>Can't find what you're looking for? Let us know your specific requirements and our staff will create a personalized service for you.</p>
+                            <form id="custom-service-form" class="mt-4">
+                                <div class="mb-3">
+                                    <label for="service_name" class="form-label">Requested Service</label>
+                                    <input type="text" class="form-control" id="service_name" placeholder="e.g., Private Chef, Birthday Setup">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="service_description" class="form-label">Details</label>
+                                    <textarea class="form-control" id="service_description" rows="4" placeholder="Please describe what you need..."></textarea>
+                                </div>
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-primary">Submit Request</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Service Booking Modal -->
+<div class="modal fade" id="serviceModal" tabindex="-1" aria-labelledby="serviceModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="serviceModalLabel">Book Service</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="service-booking-form">
+                    <input type="hidden" id="service_id" name="service_id">
+                    
+                    <div class="mb-3">
+                        <label for="service_date" class="form-label">Date</label>
+                        <input type="date" class="form-control" id="service_date" name="service_date" required min="{{ now.strftime('%Y-%m-%d') }}">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="service_time" class="form-label">Time</label>
+                        <input type="time" class="form-control" id="service_time" name="service_time" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="number_of_people" class="form-label">Number of People</label>
+                        <input type="number" class="form-control" id="number_of_people" name="number_of_people" min="1" value="1">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="special_requests" class="form-label">Special Requests</label>
+                        <textarea class="form-control" id="special_requests" name="special_requests" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirm-service-booking">Confirm Booking</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .service-card {
+        transition: transform 0.3s ease;
+        overflow: hidden;
+    }
+    
+    .service-card:hover {
+        transform: translateY(-10px);
+    }
+    
+    .service-img-container {
+        position: relative;
+        height: 200px;
+        overflow: hidden;
+    }
+    
+    .service-img-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+    
+    .service-card:hover .service-img-container img {
+        transform: scale(1.1);
+    }
+    
+    .service-status {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+    
+    .price {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #0d6efd;
+    }
+    
+    .duration {
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize service booking modal
+        const serviceModal = document.getElementById('serviceModal');
+        if (serviceModal) {
+            serviceModal.addEventListener('show.bs.modal', function(event) {
+                const button = event.relatedTarget;
+                const serviceId = button.getAttribute('data-service-id');
+                const serviceName = button.getAttribute('data-service-name');
+                
+                const modalTitle = this.querySelector('.modal-title');
+                const serviceIdInput = this.querySelector('#service_id');
+                
+                modalTitle.textContent = 'Book ' + serviceName;
+                serviceIdInput.value = serviceId;
+            });
+        }
+        
+        // Handle service booking form submission
+        const confirmBookingBtn = document.getElementById('confirm-service-booking');
+        if (confirmBookingBtn) {
+            confirmBookingBtn.addEventListener('click', function() {
+                const form = document.getElementById('service-booking-form');
+                
+                if (form.checkValidity()) {
+                    // Here you would normally submit the form data via AJAX
+                    // For demo purposes, show alert
+                    alert('Service booked successfully!');
+                    
+                    // Close modal
+                    const modal = bootstrap.Modal.getInstance(serviceModal);
+                    modal.hide();
+                } else {
+                    form.reportValidity();
+                }
+            });
+        }
+        
+        // Handle custom service form submission
+        const customServiceForm = document.getElementById('custom-service-form');
+        if (customServiceForm) {
+            customServiceForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                if (this.checkValidity()) {
+                    // Here you would normally submit the form data via AJAX
+                    // For demo purposes, show alert
+                    alert('Your service request has been submitted. Our staff will contact you shortly.');
+                    this.reset();
+                } else {
+                    this.reportValidity();
+                }
+            });
+        }
+    });
+</script>
+{% endblock %} 

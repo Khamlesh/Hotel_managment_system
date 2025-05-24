@@ -1,0 +1,804 @@
+{% extends "layout.html" %}
+
+{% block title %}Staff Portal - Maintenance{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h3 class="mb-0">Maintenance Management Portal</h3>
+                    <div>
+                        <button type="button" class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#filterModal">
+                            <i class="bi bi-funnel-fill me-1"></i>Filter
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <ul class="nav nav-tabs mb-4" id="myTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button" role="tab" aria-controls="pending" aria-selected="true">
+                                Pending <span class="badge bg-danger rounded-pill">{{ pending_count }}</span>
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="ongoing-tab" data-bs-toggle="tab" data-bs-target="#ongoing" type="button" role="tab" aria-controls="ongoing" aria-selected="false">
+                                Ongoing <span class="badge bg-warning text-dark rounded-pill">{{ ongoing_count }}</span>
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="completed-tab" data-bs-toggle="tab" data-bs-target="#completed" type="button" role="tab" aria-controls="completed" aria-selected="false">
+                                Completed <span class="badge bg-success rounded-pill">{{ completed_count }}</span>
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button" role="tab" aria-controls="all" aria-selected="false">
+                                All Requests <span class="badge bg-primary rounded-pill">{{ all_count }}</span>
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="staff-tab" data-bs-toggle="tab" data-bs-target="#staff-info" type="button" role="tab" aria-controls="staff-info" aria-selected="false">
+                                Staff Information
+                            </button>
+                        </li>
+                    </ul>
+                    
+                    <div class="tab-content" id="myTabContent">
+                        <!-- Pending Tab -->
+                        <div class="tab-pane fade show active" id="pending" role="tabpanel" aria-labelledby="pending-tab">
+                            {% if pending_requests %}
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Room</th>
+                                            <th>Issue</th>
+                                            <th>Reported</th>
+                                            <th>Priority</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for request in pending_requests %}
+                                        <tr>
+                                            <td>{{ request.Maintenance_ID }}</td>
+                                            <td>
+                                                {% if request.room %}
+                                                <div>
+                                                    <strong>Room {{ request.room.Room_Number }}</strong><br>
+                                                    <small class="text-muted">{{ request.room.room_type.Type_Name }}</small>
+                                                </div>
+                                                {% else %}
+                                                Unknown
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ request.Issue_Reported|truncate(30) }}</td>
+                                            <td>{{ request.Report_Date.strftime('%b %d, %Y') }}</td>
+                                            <td>
+                                                {% set priority = extract_priority(request.Issue_Reported) if extract_priority is defined else get_priority_from_text(request.Issue_Reported) %}
+                                                {% if priority == 'Emergency' %}
+                                                <span class="badge bg-danger">Emergency</span>
+                                                {% elif priority == 'High' %}
+                                                <span class="badge bg-warning">High</span>
+                                                {% elif priority == 'Medium' %}
+                                                <span class="badge bg-info">Medium</span>
+                                                {% else %}
+                                                <span class="badge bg-secondary">Low</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <div class="btn-group btn-group-sm">
+                                                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#viewModal{{ request.Maintenance_ID }}">
+                                                        <i class="bi bi-eye"></i> View
+                                                    </button>
+                                                    <a href="{{ url_for('assign_maintenance', maintenance_id=request.Maintenance_ID) }}" class="btn btn-outline-success">
+                                                        <i class="bi bi-person-check"></i> Assign
+                                                    </a>
+                                                </div>
+                                                
+                                                <!-- View Modal -->
+                                                <div class="modal fade" id="viewModal{{ request.Maintenance_ID }}" tabindex="-1" aria-labelledby="viewModalLabel{{ request.Maintenance_ID }}" aria-hidden="true">
+                                                    <div class="modal-dialog modal-lg">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header bg-primary text-white">
+                                                                <h5 class="modal-title" id="viewModalLabel{{ request.Maintenance_ID }}">Maintenance Request #{{ request.Maintenance_ID }}</h5>
+                                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <div class="row mb-3">
+                                                                    <div class="col-md-6">
+                                                                        <h6>Room Information</h6>
+                                                                        <p>
+                                                                            {% if request.room %}
+                                                                            <strong>Room:</strong> {{ request.room.Room_Number }}<br>
+                                                                            <strong>Type:</strong> {{ request.room.room_type.Type_Name }}<br>
+                                                                            <strong>Floor:</strong> {{ request.room.Floor_Number }}
+                                                                            {% else %}
+                                                                            No room information available
+                                                                            {% endif %}
+                                                                        </p>
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <h6>Request Details</h6>
+                                                                        <p>
+                                                                            <strong>Status:</strong> <span class="badge bg-danger">{{ request.Status }}</span><br>
+                                                                            <strong>Reported On:</strong> {{ request.Report_Date.strftime('%B %d, %Y') }}<br>
+                                                                            <strong>Technician:</strong> {{ request.Assigned_To if request.Assigned_To else 'Not Assigned' }}
+                                                                        </p>
+                                                                    </div>
+                                                                </div>
+                                                                
+                                                                <div class="card mb-3">
+                                                                    <div class="card-header bg-light">
+                                                                        <h6 class="mb-0">Issue Description</h6>
+                                                                    </div>
+                                                                    <div class="card-body">
+                                                                        <p style="white-space: pre-line;">{{ request.Issue_Reported }}</p>
+                                                                    </div>
+                                                                </div>
+                                                                
+                                                                <h6>Current Guest Information</h6>
+                                                                <p>
+                                                                    {% set guest = get_current_guest(request.room.Room_ID) if request.room else None %}
+                                                                    {% if guest %}
+                                                                    <strong>Guest Name:</strong> {{ guest.First_Name }} {{ guest.Last_Name }}<br>
+                                                                    <strong>Contact:</strong> {{ guest.Contact_Number }}<br>
+                                                                    <strong>Check-out:</strong> {{ guest.Check_Out_Date.strftime('%B %d, %Y') }}
+                                                                    {% else %}
+                                                                    No current guest information available
+                                                                    {% endif %}
+                                                                </p>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                                <a href="{{ url_for('assign_maintenance', maintenance_id=request.Maintenance_ID) }}" class="btn btn-success">
+                                                                    Assign Technician
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% else %}
+                            <div class="text-center py-5">
+                                <i class="bi bi-check-circle-fill text-success fs-1 mb-3"></i>
+                                <h5>No pending maintenance requests!</h5>
+                                <p class="text-muted">All maintenance requests have been assigned or completed.</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Ongoing Tab -->
+                        <div class="tab-pane fade" id="ongoing" role="tabpanel" aria-labelledby="ongoing-tab">
+                            {% if ongoing_requests %}
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Room</th>
+                                            <th>Issue</th>
+                                            <th>Technician</th>
+                                            <th>Days Active</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for request in ongoing_requests %}
+                                        <tr>
+                                            <td>{{ request.Maintenance_ID }}</td>
+                                            <td>
+                                                {% if request.room %}
+                                                <div>
+                                                    <strong>Room {{ request.room.Room_Number }}</strong><br>
+                                                    <small class="text-muted">{{ request.room.room_type.Type_Name }}</small>
+                                                </div>
+                                                {% else %}
+                                                Unknown
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ request.Issue_Reported|truncate(30) }}</td>
+                                            <td>{{ request.Technician_Assigned }}</td>
+                                            <td>{{ (today - request.Report_Date.date()).days }} days</td>
+                                            <td>
+                                                <button type="button" class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#viewModal{{ request.Maintenance_ID }}">
+                                                    <i class="bi bi-eye"></i> View
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-success me-1" data-bs-toggle="modal" data-bs-target="#completeModal{{ request.Maintenance_ID }}">
+                                                    <i class="bi bi-check-circle"></i> Complete
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#scheduleModal{{ request.Maintenance_ID }}">
+                                                    <i class="bi bi-clock"></i> Auto-Complete
+                                                </button>
+                                                
+                                                <!-- Complete Modal -->
+                                                <div class="modal fade" id="completeModal{{ request.Maintenance_ID }}" tabindex="-1" aria-labelledby="completeModalLabel{{ request.Maintenance_ID }}" aria-hidden="true">
+                                                    <div class="modal-dialog">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header bg-success text-white">
+                                                                <h5 class="modal-title" id="completeModalLabel{{ request.Maintenance_ID }}">Mark as Completed</h5>
+                                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                            <form method="POST" action="{{ url_for('complete_maintenance', maintenance_id=request.Maintenance_ID) }}">
+                                                                <div class="modal-body">
+                                                                    <div class="mb-3">
+                                                                        <label for="final_cost{{ request.Maintenance_ID }}" class="form-label">Final Repair Cost (₹)</label>
+                                                                        <input type="number" class="form-control" id="final_cost{{ request.Maintenance_ID }}" name="final_cost" min="0" step="0.01" value="{{ request.Repair_Cost if request.Repair_Cost else 0 }}" required>
+                                                                    </div>
+                                                                    <div class="mb-3">
+                                                                        <label for="resolution{{ request.Maintenance_ID }}" class="form-label">Resolution Details</label>
+                                                                        <textarea class="form-control" id="resolution{{ request.Maintenance_ID }}" name="resolution" rows="3" required></textarea>
+                                                                    </div>
+                                                                    <div class="mb-3">
+                                                                        <label for="completion_date{{ request.Maintenance_ID }}" class="form-label">Completion Date</label>
+                                                                        <input type="date" class="form-control" id="completion_date{{ request.Maintenance_ID }}" name="completion_date" value="{{ today.strftime('%Y-%m-%d') }}" required>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                                    <button type="submit" class="btn btn-success">Mark as Completed</button>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <!-- Schedule Auto-Complete Modal -->
+                                                <div class="modal fade" id="scheduleModal{{ request.Maintenance_ID }}" tabindex="-1" aria-labelledby="scheduleModalLabel{{ request.Maintenance_ID }}" aria-hidden="true">
+                                                    <div class="modal-dialog">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header bg-info text-white">
+                                                                <h5 class="modal-title" id="scheduleModalLabel{{ request.Maintenance_ID }}">Schedule Auto-Completion</h5>
+                                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                            <form method="POST" action="{{ url_for('schedule_maintenance_completion', maintenance_id=request.Maintenance_ID) }}">
+                                                                <div class="modal-body">
+                                                                    <p class="text-muted"><i class="bi bi-info-circle"></i> Schedule this maintenance request to be automatically marked as completed after a specified time period.</p>
+                                                                    
+                                                                    <div class="mb-3">
+                                                                        <label for="hours{{ request.Maintenance_ID }}" class="form-label">Complete After (hours)</label>
+                                                                        <select class="form-select" id="hours{{ request.Maintenance_ID }}" name="hours">
+                                                                            <option value="1">1 hour</option>
+                                                                            <option value="2">2 hours</option>
+                                                                            <option value="4">4 hours</option>
+                                                                            <option value="8">8 hours</option>
+                                                                            <option value="12">12 hours</option>
+                                                                            <option value="24" selected>24 hours</option>
+                                                                            <option value="48">48 hours</option>
+                                                                            <option value="72">72 hours (3 days)</option>
+                                                                        </select>
+                                                                    </div>
+                                                                    
+                                                                    <div class="mb-3">
+                                                                        <label for="schedule_notes{{ request.Maintenance_ID }}" class="form-label">Completion Notes</label>
+                                                                        <textarea class="form-control" id="schedule_notes{{ request.Maintenance_ID }}" name="notes" rows="2" placeholder="Add notes about the scheduled completion..."></textarea>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                                    <button type="submit" class="btn btn-info">
+                                                                        <i class="bi bi-clock"></i> Schedule Auto-Completion
+                                                                    </button>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% else %}
+                            <div class="text-center py-5">
+                                <i class="bi bi-tools text-muted fs-1 mb-3"></i>
+                                <h5>No ongoing maintenance tasks</h5>
+                                <p class="text-muted">There are currently no maintenance tasks in progress.</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Completed Tab -->
+                        <div class="tab-pane fade" id="completed" role="tabpanel" aria-labelledby="completed-tab">
+                            {% if completed_requests %}
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Room</th>
+                                            <th>Issue</th>
+                                            <th>Technician</th>
+                                            <th>Completed On</th>
+                                            <th>Cost</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for request in completed_requests %}
+                                        <tr>
+                                            <td>{{ request.Maintenance_ID }}</td>
+                                            <td>
+                                                {% if request.room %}
+                                                <div>
+                                                    <strong>Room {{ request.room.Room_Number }}</strong><br>
+                                                    <small class="text-muted">{{ request.room.room_type.Type_Name }}</small>
+                                                </div>
+                                                {% else %}
+                                                Unknown
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ request.Issue_Reported|truncate(30) }}</td>
+                                            <td>{{ request.Assigned_To }}</td>
+                                            <td>{{ request.Completion_Date.strftime('%b %d, %Y') if request.Completion_Date else 'N/A' }}</td>
+                                            <td>₹{{ "%.2f"|format(request.Repair_Cost) if request.Repair_Cost else '0.00' }}</td>
+                                            <td>
+                                                <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#viewModal{{ request.Maintenance_ID }}">
+                                                    <i class="bi bi-eye"></i> View
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% else %}
+                            <div class="text-center py-5">
+                                <i class="bi bi-clipboard-check text-muted fs-1 mb-3"></i>
+                                <h5>No completed maintenance tasks</h5>
+                                <p class="text-muted">There are no maintenance tasks that have been completed yet.</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- All Requests Tab -->
+                        <div class="tab-pane fade" id="all" role="tabpanel" aria-labelledby="all-tab">
+                            {% if all_requests %}
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Room</th>
+                                            <th>Issue</th>
+                                            <th>Status</th>
+                                            <th>Reported On</th>
+                                            <th>Technician</th>
+                                            <th>Cost</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for request in all_requests %}
+                                        <tr>
+                                            <td>{{ request.Maintenance_ID }}</td>
+                                            <td>
+                                                {% if request.room %}
+                                                <div>
+                                                    <strong>Room {{ request.room.Room_Number }}</strong><br>
+                                                    <small class="text-muted">{{ request.room.room_type.Type_Name }}</small>
+                                                </div>
+                                                {% else %}
+                                                Unknown
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ request.Issue_Reported|truncate(30) }}</td>
+                                            <td>
+                                                {% if request.Status == 'Completed' %}
+                                                <span class="badge bg-success">{{ request.Status }}</span>
+                                                {% elif request.Status == 'Ongoing' %}
+                                                <span class="badge bg-warning text-dark">{{ request.Status }}</span>
+                                                {% else %}
+                                                <span class="badge bg-danger">{{ request.Status }}</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ request.Report_Date.strftime('%b %d, %Y') }}</td>
+                                            <td>{{ request.Assigned_To if request.Assigned_To else 'Not Assigned' }}</td>
+                                            <td>₹{{ "%.2f"|format(request.Repair_Cost) if request.Repair_Cost else '0.00' }}</td>
+                                            <td>
+                                                <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#viewModal{{ request.Maintenance_ID }}">
+                                                    <i class="bi bi-eye"></i> View
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% else %}
+                            <div class="text-center py-5">
+                                <i class="bi bi-emoji-smile text-muted fs-1 mb-3"></i>
+                                <h5>No maintenance requests</h5>
+                                <p class="text-muted">There are no maintenance requests in the system.</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Staff Information Tab -->
+                        <div class="tab-pane fade" id="staff-info" role="tabpanel" aria-labelledby="staff-tab">
+                            <div class="card shadow mb-4">
+                                <div class="card-header bg-primary text-white">
+                                    <h5 class="mb-0">Staff Information</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover align-middle">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>Staff ID</th>
+                                                    <th>Name</th>
+                                                    <th>Department ID</th>
+                                                    <th>Role/Position</th>
+                                                    <th>Contact Number</th>
+                                                    <th>Salary (₹)</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for staff in all_staff %}
+                                                <tr>
+                                                    <td>{{ staff.Staff_ID }}</td>
+                                                    <td>{{ staff.First_Name }} {{ staff.Last_Name }}</td>
+                                                    <td>
+                                                        {% if staff.Department_ID %}
+                                                        {{ staff.Department_ID }}
+                                                        {% if staff.department %}
+                                                        <small class="text-muted d-block">{{ staff.department.Department_Name }}</small>
+                                                        {% endif %}
+                                                        {% else %}
+                                                        --
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>{{ staff.Role_Position }}</td>
+                                                    <td>{{ staff.Contact_Number }}</td>
+                                                    <td>₹{{ "%.2f"|format(staff.Salary) }}</td>
+                                                    <td>
+                                                        <div class="btn-group btn-group-sm">
+                                                            <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#viewStaffModal{{ staff.Staff_ID }}">
+                                                                <i class="bi bi-eye"></i> View
+                                                            </button>
+                                                            <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editStaffModal{{ staff.Staff_ID }}">
+                                                                <i class="bi bi-pencil"></i> Edit
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    
+                                    {% if not all_staff %}
+                                    <div class="text-center py-5">
+                                        <i class="bi bi-people text-muted fs-1 mb-3"></i>
+                                        <h5>No staff records found</h5>
+                                        <p class="text-muted">There are no staff members in the system.</p>
+                                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addStaffModal">
+                                            <i class="bi bi-person-plus"></i> Add Staff Member
+                                        </button>
+                                    </div>
+                                    {% else %}
+                                    <div class="text-end mt-3">
+                                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addStaffModal">
+                                            <i class="bi bi-person-plus"></i> Add Staff Member
+                                        </button>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    <!-- Add Staff Modal -->
+                                    <div class="modal fade" id="addStaffModal" tabindex="-1" aria-labelledby="addStaffModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header bg-primary text-white">
+                                                    <h5 class="modal-title" id="addStaffModalLabel">Add New Staff Member</h5>
+                                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <form method="POST" action="{{ url_for('add_staff') }}">
+                                                    <div class="modal-body">
+                                                        <div class="row mb-3">
+                                                            <div class="col-md-6">
+                                                                <label for="first_name" class="form-label">First Name</label>
+                                                                <input type="text" class="form-control" id="first_name" name="first_name" required>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <label for="last_name" class="form-label">Last Name</label>
+                                                                <input type="text" class="form-control" id="last_name" name="last_name" required>
+                                                            </div>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label for="department_id" class="form-label">Department</label>
+                                                            <select class="form-select" id="department_id" name="department_id">
+                                                                <option value="" selected>Select Department</option>
+                                                                {% for dept in departments %}
+                                                                <option value="{{ dept.Department_ID }}">{{ dept.Department_Name }}</option>
+                                                                {% endfor %}
+                                                            </select>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label for="role_position" class="form-label">Role/Position</label>
+                                                            <input type="text" class="form-control" id="role_position" name="role_position" required>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label for="contact_number" class="form-label">Contact Number</label>
+                                                            <input type="text" class="form-control" id="contact_number" name="contact_number" required>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label for="salary" class="form-label">Salary (₹)</label>
+                                                            <input type="number" class="form-control" id="salary" name="salary" min="0" step="0.01" required>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                        <button type="submit" class="btn btn-primary">Add Staff</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Dashboard Cards -->
+    <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card bg-primary text-white shadow">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <i class="bi bi-tools fs-1"></i>
+                        </div>
+                        <div>
+                            <p class="mb-1">Total Requests</p>
+                            <h3 class="mb-0">{{ all_count }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card bg-danger text-white shadow">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <i class="bi bi-exclamation-triangle-fill fs-1"></i>
+                        </div>
+                        <div>
+                            <p class="mb-1">Pending</p>
+                            <h3 class="mb-0">{{ pending_count }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card bg-warning text-dark shadow">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <i class="bi bi-gear-fill fs-1"></i>
+                        </div>
+                        <div>
+                            <p class="mb-1">In Progress</p>
+                            <h3 class="mb-0">{{ ongoing_count }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card bg-success text-white shadow">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <i class="bi bi-check-circle-fill fs-1"></i>
+                        </div>
+                        <div>
+                            <p class="mb-1">Completed</p>
+                            <h3 class="mb-0">{{ completed_count }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Technician Workload Statistics -->
+    <div class="row mb-4">
+        <div class="col-lg-12">
+            <div class="card shadow technician-workload-section">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-people-fill me-2"></i>Technician Workload Dashboard</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for staff in maintenance_staff %}
+                        {% set tech_name = staff.First_Name + ' ' + staff.Last_Name if (staff.First_Name and staff.Last_Name) else staff.get('First_Name', '') + ' ' + staff.get('Last_Name', '') %}
+                        {% set active_tasks = all_requests|selectattr('Technician_Assigned', 'eq', tech_name)|selectattr('Maintenance_Status', 'eq', 'Ongoing')|list|length %}
+                        {% set completed_tasks = all_requests|selectattr('Technician_Assigned', 'eq', tech_name)|selectattr('Maintenance_Status', 'eq', 'Completed')|list|length %}
+                        {% set role = staff.Role_Position if staff.Role_Position else staff.get('Role_Position', '') %}
+                        
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100 technician-card">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="technician-avatar">
+                                            <i class="bi bi-person-badge fs-4"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="mb-0">{{ tech_name }}</h5>
+                                            <span class="badge bg-info">{{ role }}</span>
+                                            {% if staff.Experience or staff.get('Experience') %}
+                                            <small class="d-block text-muted">{{ staff.Experience if staff.Experience else staff.get('Experience', '') }}</small>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="progress workload-progress">
+                                        <div class="progress-bar bg-warning" role="progressbar" data-workload="{{ (active_tasks / 5) * 100 if active_tasks else 0 }}" style="width: 0%;"></div>
+                                    </div>
+                                    
+                                    <div class="workload-data">
+                                        <div>
+                                            <small class="text-muted">Current Workload:</small>
+                                            <h6>{{ active_tasks }} Tasks</h6>
+                                        </div>
+                                        <div>
+                                            <small class="text-muted">Completed:</small>
+                                            <h6>{{ completed_tasks }} Tasks</h6>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="technician-specialty">
+                                        <small class="text-muted">Specialty:</small>
+                                        <p class="mb-0">{{ staff.Specialization if staff.Specialization else staff.get('Specialization', 'General Maintenance') }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Filter Modal -->
+    <div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="filterModalLabel">Filter Maintenance Requests</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form method="GET" action="{{ url_for('staff_portal') }}">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="filter_status" class="form-label">Status</label>
+                            <select class="form-select" id="filter_status" name="status">
+                                <option value="all" selected>All Statuses</option>
+                                <option value="Pending">Pending</option>
+                                <option value="Ongoing">Ongoing</option>
+                                <option value="Completed">Completed</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="filter_date_from" class="form-label">Date From</label>
+                            <input type="date" class="form-control" id="filter_date_from" name="date_from">
+                        </div>
+                        <div class="mb-3">
+                            <label for="filter_date_to" class="form-label">Date To</label>
+                            <input type="date" class="form-control" id="filter_date_to" name="date_to">
+                        </div>
+                        <div class="mb-3">
+                            <label for="filter_technician" class="form-label">Technician</label>
+                            <select class="form-select" id="filter_technician" name="technician">
+                                <option value="all" selected>All Technicians</option>
+                                <option value="unassigned">Unassigned</option>
+                                {% for staff in maintenance_staff %}
+                                <option value="{{ staff.First_Name }} {{ staff.Last_Name }}">{{ staff.First_Name }} {{ staff.Last_Name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Apply Filters</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Script to set progress bar widths -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const progressBars = document.querySelectorAll('.progress-bar[data-workload]');
+        progressBars.forEach(function(bar) {
+            const workload = bar.getAttribute('data-workload');
+            bar.style.width = workload + '%';
+        });
+    });
+</script>
+{% endblock %}
+
+{% block scripts %}
+    <!-- Progress bar animation script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add animation to all progress bars with data-workload attribute
+            const progressBars = document.querySelectorAll('.progress-bar[data-workload]');
+            
+            progressBars.forEach(function(bar) {
+                const workload = bar.getAttribute('data-workload');
+                
+                // Animate the progress bar
+                setTimeout(function() {
+                    bar.style.width = workload + '%';
+                    
+                    // Add color based on workload level
+                    if (parseFloat(workload) < 30) {
+                        bar.classList.remove('bg-warning', 'bg-danger');
+                        bar.classList.add('bg-success');
+                    } else if (parseFloat(workload) < 70) {
+                        bar.classList.remove('bg-success', 'bg-danger');
+                        bar.classList.add('bg-warning');
+                    } else {
+                        bar.classList.remove('bg-success', 'bg-warning');
+                        bar.classList.add('bg-danger');
+                    }
+                    
+                    // Add a tooltip showing exact percentage
+                    const parentDiv = bar.closest('.progress');
+                    const percentText = document.createElement('span');
+                    percentText.className = 'position-absolute end-0 small pe-2 text-dark';
+                    percentText.textContent = Math.round(parseFloat(workload)) + '%';
+                    percentText.style.fontSize = '10px';
+                    percentText.style.top = '-15px';
+                    parentDiv.style.position = 'relative';
+                    parentDiv.appendChild(percentText);
+                    
+                }, 300);
+            });
+
+            // Highlight the technician with highest workload
+            const technicianCards = document.querySelectorAll('.technician-card');
+            let maxWorkload = 0;
+            let busyTechnician = null;
+            
+            technicianCards.forEach(function(card) {
+                const bar = card.querySelector('.progress-bar[data-workload]');
+                if (bar) {
+                    const workload = parseFloat(bar.getAttribute('data-workload'));
+                    if (workload > maxWorkload) {
+                        maxWorkload = workload;
+                        busyTechnician = card;
+                    }
+                }
+            });
+            
+            if (busyTechnician && maxWorkload > 60) {
+                busyTechnician.classList.add('border-danger');
+                const warningBadge = document.createElement('span');
+                warningBadge.className = 'position-absolute top-0 end-0 badge bg-danger';
+                warningBadge.innerHTML = 'High Workload <i class="bi bi-exclamation-triangle"></i>';
+                warningBadge.style.transform = 'translate(10px, -10px)';
+                busyTechnician.style.position = 'relative';
+                busyTechnician.appendChild(warningBadge);
+            }
+        });
+    </script>
+{% endblock %} 

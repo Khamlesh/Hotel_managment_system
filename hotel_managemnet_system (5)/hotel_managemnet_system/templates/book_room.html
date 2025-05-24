@@ -1,0 +1,460 @@
+{% extends "layout.html" %}
+
+{% block title %}Book Room{% endblock %}
+
+{% block content %}
+<!-- Booking Banner -->
+<section class="page-banner">
+    <div class="banner-content">
+        <div class="container">
+            <h1 class="display-4 text-white">Complete Your Booking</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb justify-content-center">
+                    <li class="breadcrumb-item"><a href="{{ url_for('index') }}" class="text-white">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('rooms') }}" class="text-white">Rooms</a></li>
+                    <li class="breadcrumb-item active text-white" aria-current="page">Book Room</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+</section>
+
+<!-- Booking Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card shadow mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="mb-0">Book Your Stay</h3>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="{{ url_for('book_room', room_id=room.Room_ID) }}">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="check_in_date" class="form-label">Check In Date</label>
+                                    <input type="date" class="form-control" id="check_in_date" name="check_in_date" required min="{{ today }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="check_out_date" class="form-label">Check Out Date</label>
+                                    <input type="date" class="form-control" id="check_out_date" name="check_out_date" required min="{{ today }}">
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label for="adults" class="form-label">Adults</label>
+                                    <select class="form-select" id="adults" name="adults">
+                                        <option value="1">1</option>
+                                        <option value="2" selected>2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="children" class="form-label">Children</label>
+                                    <select class="form-select" id="children" name="children">
+                                        <option value="0" selected>0</option>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="col-12">
+                                    <hr>
+                                    <h4>Guest Information</h4>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label for="first_name" class="form-label">First Name</label>
+                                    <input type="text" class="form-control" id="first_name" name="first_name" value="{{ current_user.First_Name }}" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="last_name" class="form-label">Last Name</label>
+                                    <input type="text" class="form-control" id="last_name" name="last_name" value="{{ current_user.Last_Name }}" required>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="email" name="email" value="{{ current_user.Email }}" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="phone" class="form-label">Phone Number</label>
+                                    <input type="tel" class="form-control" id="phone" name="phone" value="{{ current_user.Contact_Number }}" required>
+                                </div>
+                                
+                                <div class="col-12">
+                                    <label for="special_requests" class="form-label">Special Requests</label>
+                                    <textarea class="form-control" id="special_requests" name="special_requests" rows="3" placeholder="Let us know if you have any special requests..."></textarea>
+                                </div>
+                                
+                                <div class="col-12">
+                                    <hr>
+                                    <h4>Payment Information</h4>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label for="discount_code" class="form-label">Discount Code (if any)</label>
+                                    <input type="text" class="form-control" id="discount_code" name="discount_code">
+                                </div>
+                                
+                                <div class="col-12 mt-2">
+                                    <div class="alert alert-info">
+                                        <h6 class="alert-heading"><i class="fas fa-tag me-2"></i>Available Discount Codes</h6>
+                                        <div class="row g-2 mt-2">
+                                            <div class="col-md-6">
+                                                <div class="card border-primary h-100">
+                                                    <div class="card-body p-2">
+                                                        <h6 class="card-title mb-1">SUMMER2023</h6>
+                                                        <p class="card-text small mb-0">15% off your booking</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="card border-primary h-100">
+                                                    <div class="card-body p-2">
+                                                        <h6 class="card-title mb-1">WELCOME10</h6>
+                                                        <p class="card-text small mb-0">10% off your booking</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="card border-primary h-100">
+                                                    <div class="card-body p-2">
+                                                        <h6 class="card-title mb-1">FAMILY25</h6>
+                                                        <p class="card-text small mb-0">25% off family rooms</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="card border-primary h-100">
+                                                    <div class="card-body p-2">
+                                                        <h6 class="card-title mb-1">WEEKEND15</h6>
+                                                        <p class="card-text small mb-0">15% off weekend stays</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-12">
+                                    <hr>
+                                    <h4>Terms and Conditions</h4>
+                                </div>
+                                
+                                <div class="col-12">
+                                    <div class="form-check mt-3">
+                                        <input class="form-check-input" type="checkbox" id="terms_agree" name="terms_agree" required>
+                                        <label class="form-check-label" for="terms_agree">
+                                            I agree to the <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">terms and conditions</a>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-12">
+                                    <div id="alert-placeholder"></div>
+                                </div>
+                                
+                                <div class="col-12">
+                                    <button type="submit" class="btn btn-primary btn-lg">Proceed to Payment</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="sticky-top" style="top: 20px;">
+                    <div class="card shadow mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h4 class="mb-0">Booking Summary</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-3">
+                                <img src="https://images.unsplash.com/photo-{{ '1566665797739-1674de7a421a' if room.Room_Type_ID == 1 else '1590490360182-c33d57733427' if room.Room_Type_ID == 2 else '1591088398332-8a7791972843' if room.Room_Type_ID == 3 else '1578683010236-d716f9a3f461' }}" alt="{{ room.room_type.Type_Name }}" class="img-thumbnail me-3" style="width: 80px; height: 80px; object-fit: cover;">
+                                <div>
+                                    <h5 class="mb-0">{{ room.room_type.Type_Name }}</h5>
+                                    <p class="text-muted mb-0">Room {{ room.Room_Number }}</p>
+                                </div>
+                            </div>
+                            
+                            <hr>
+                            
+                            <div class="booking-details">
+                                <div class="row mb-2">
+                                    <div class="col-6 text-muted">Room Type:</div>
+                                    <div class="col-6 text-end">{{ room.room_type.Type_Name }}</div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-6 text-muted">Max Occupancy:</div>
+                                    <div class="col-6 text-end">{{ room.Capacity }} Persons</div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-6 text-muted">Bed Type:</div>
+                                    <div class="col-6 text-end">{{ room.room_type.Bed_Type }}</div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-6 text-muted">Price per Night:</div>
+                                    <div class="col-6 text-end">₹{{ room.Price_Per_Night }}</div>
+                                </div>
+                            </div>
+                            
+                            <hr>
+                            
+                            <div id="price-calculation" class="d-none">
+                                <div class="row mb-2">
+                                    <div class="col-6 text-muted">Total Nights:</div>
+                                    <div class="col-6 text-end"><span id="total-nights">0</span> Nights</div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-6 text-muted">Room Total:</div>
+                                    <div class="col-6 text-end" id="room-total">₹0.00</div>
+                                </div>
+                                <div class="row mb-2" id="discount-row">
+                                    <div class="col-6 text-muted">Discount:</div>
+                                    <div class="col-6 text-end text-success" id="discount-amount">-₹0.00</div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-6 text-muted">Taxes & Fees:</div>
+                                    <div class="col-6 text-end" id="taxes-fees">₹0.00</div>
+                                </div>
+                                <hr>
+                                <div class="row mb-2">
+                                    <div class="col-6"><strong>Total:</strong></div>
+                                    <div class="col-6 text-end"><strong id="final-total">₹0.00</strong></div>
+                                </div>
+                            </div>
+                            
+                            <div class="alert alert-info mt-3">
+                                <i class="fas fa-info-circle me-2"></i> Enter your dates to calculate the total price
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card shadow">
+                        <div class="card-body">
+                            <h5>Hotel Policies</h5>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check-circle text-success me-2"></i> Free cancellation up to 24 hours before check-in</li>
+                                <li><i class="fas fa-check-circle text-success me-2"></i> Check-in: 2:00 PM - 12:00 AM</li>
+                                <li><i class="fas fa-check-circle text-success me-2"></i> Check-out: 12:00 PM</li>
+                                <li><i class="fas fa-times-circle text-danger me-2"></i> No smoking allowed</li>
+                                <li><i class="fas fa-times-circle text-danger me-2"></i> No pets allowed</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Terms and Conditions Modal -->
+<div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="termsModalLabel">Terms and Conditions</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h6>Booking Terms</h6>
+                <p>By making a reservation at Luxury Hotel, you agree to the following terms and conditions:</p>
+                <ol>
+                    <li><strong>Reservation:</strong> A valid credit card is required to secure your reservation.</li>
+                    <li><strong>Cancellation Policy:</strong> Free cancellation up to 24 hours before check-in. Cancellations made less than 24 hours before check-in are subject to a charge of one night's stay.</li>
+                    <li><strong>Check-in/Check-out:</strong> Check-in time is from 2:00 PM, and check-out time is by 12:00 PM.</li>
+                    <li><strong>Payment:</strong> The total amount due will be charged to your credit card upon confirmation of booking.</li>
+                    <li><strong>Damages:</strong> You are responsible for any damages caused to the room or hotel property during your stay.</li>
+                    <li><strong>Hotel Policies:</strong> You agree to abide by all hotel policies, including no smoking and no pets.</li>
+                </ol>
+                
+                <h6>Privacy Policy</h6>
+                <p>Luxury Hotel respects your privacy and is committed to protecting your personal data. The information collected during the booking process will be used solely for the purpose of managing your reservation and enhancing your stay.</p>
+                
+                <h6>Disclaimer</h6>
+                <p>Luxury Hotel reserves the right to modify these terms and conditions at any time. The current version will be available on our website.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">I Agree</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const roomPrice = parseFloat("{{ room.Price_Per_Night }}");
+        const checkInDate = document.getElementById('check_in_date');
+        const checkOutDate = document.getElementById('check_out_date');
+        const discountCode = document.getElementById('discount_code');
+        const priceCalculation = document.getElementById('price-calculation');
+        const totalNights = document.getElementById('total-nights');
+        const roomTotal = document.getElementById('room-total');
+        const discountRow = document.getElementById('discount-row');
+        const discountAmount = document.getElementById('discount-amount');
+        const taxesFees = document.getElementById('taxes-fees');
+        const finalTotal = document.getElementById('final-total');
+        const alertInfo = document.querySelector('.alert-info');
+        
+        // Hide discount row initially
+        discountRow.style.display = 'none';
+        
+        // Set minimum date to today
+        const today = new Date().toISOString().split('T')[0];
+        checkInDate.min = today;
+        checkOutDate.min = today;
+        
+        // Update check-out min date when check-in changes
+        checkInDate.addEventListener('change', function() {
+            checkOutDate.min = this.value;
+            
+            // If check-out date is earlier than check-in, update it
+            if(checkOutDate.value && checkOutDate.value < this.value) {
+                checkOutDate.value = this.value;
+            }
+            
+            updatePriceCalculation();
+        });
+        
+        // Update price calculation when check-out date changes
+        checkOutDate.addEventListener('change', function() {
+            updatePriceCalculation();
+        });
+        
+        // Handle discount code
+        discountCode.addEventListener('blur', function() {
+            updatePriceCalculation();
+        });
+
+        // Copy discount code to clipboard when clicked
+        document.querySelectorAll('.card-title').forEach(function(element) {
+            element.style.cursor = 'pointer';
+            element.addEventListener('click', function() {
+                const code = this.textContent.trim();
+                discountCode.value = code;
+                updatePriceCalculation();
+                
+                // Show a temporary message
+                const card = this.closest('.card');
+                const originalBorderColor = card.style.borderColor;
+                card.style.borderColor = '#28a745';
+                setTimeout(function() {
+                    card.style.borderColor = originalBorderColor;
+                }, 1000);
+            });
+        });
+        
+        // Update price calculation
+        function updatePriceCalculation() {
+            if(checkInDate.value && checkOutDate.value) {
+                const checkIn = new Date(checkInDate.value);
+                const checkOut = new Date(checkOutDate.value);
+                
+                if(checkOut > checkIn) {
+                    // Calculate number of nights
+                    const diffTime = Math.abs(checkOut - checkIn);
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    totalNights.textContent = diffDays;
+                    
+                    // Calculate room total
+                    const roomTotalPrice = roomPrice * diffDays;
+                    roomTotal.textContent = '₹' + roomTotalPrice.toFixed(2);
+                    
+                    // Calculate taxes (example: 10% tax)
+                    const taxRate = 0.10;
+                    const taxAmount = roomTotalPrice * taxRate;
+                    taxesFees.textContent = '₹' + taxAmount.toFixed(2);
+                    
+                    // Apply discount if valid
+                    let discountApplied = 0;
+                    let discountPercentage = 0;
+                    
+                    if(discountCode.value.trim() !== '') {
+                        // Get the code and check validity
+                        const code = discountCode.value.toUpperCase();
+                        
+                        // Check for room type specific discounts
+                        const roomType = "{{ room.room_type.Type_Name }}";
+                        const isWeekend = isWeekendStay(checkIn, checkOut);
+                        
+                        if(code === 'SUMMER2023') {
+                            discountPercentage = 15;
+                        } else if(code === 'WELCOME10') {
+                            discountPercentage = 10;
+                        } else if(code === 'FAMILY25' && roomType === 'Family') {
+                            discountPercentage = 25;
+                        } else if(code === 'WEEKEND15' && isWeekend) {
+                            discountPercentage = 15;
+                        } else if(code === 'LOYALTY20') {
+                            discountPercentage = 20;
+                        } else if(code === 'EARLYBIRD') {
+                            // Early bird discount - 30 days before check-in
+                            const today = new Date();
+                            const daysUntilCheckIn = Math.ceil((checkIn - today) / (1000 * 60 * 60 * 24));
+                            if (daysUntilCheckIn >= 30) {
+                                discountPercentage = 20;
+                            }
+                        }
+                        
+                        if(discountPercentage > 0) {
+                            discountApplied = roomTotalPrice * (discountPercentage / 100);
+                            discountAmount.textContent = '-₹' + discountApplied.toFixed(2);
+                            discountRow.style.display = '';
+                        } else {
+                            // Invalid discount code
+                            discountRow.style.display = 'none';
+                        }
+                    } else {
+                        // No discount code
+                        discountRow.style.display = 'none';
+                    }
+                    
+                    // Calculate final total
+                    const total = roomTotalPrice + taxAmount - discountApplied;
+                    finalTotal.textContent = '₹' + total.toFixed(2);
+                    
+                    // Show price calculation, hide alert
+                    priceCalculation.classList.remove('d-none');
+                    alertInfo.classList.add('d-none');
+                } else {
+                    // Check-out must be after check-in
+                    priceCalculation.classList.add('d-none');
+                    alertInfo.classList.remove('d-none');
+                    alertInfo.textContent = 'Check-out date must be after check-in date';
+                    alertInfo.classList.remove('alert-info');
+                    alertInfo.classList.add('alert-warning');
+                }
+            } else {
+                // Dates not selected yet
+                priceCalculation.classList.add('d-none');
+                alertInfo.classList.remove('d-none');
+                alertInfo.textContent = 'Enter your dates to calculate the total price';
+                alertInfo.classList.remove('alert-warning');
+                alertInfo.classList.add('alert-info');
+            }
+        }
+        
+        // Helper function to check if stay includes weekend
+        function isWeekendStay(checkIn, checkOut) {
+            // Clone the dates to avoid modifying originals
+            let currentDate = new Date(checkIn);
+            const endDate = new Date(checkOut);
+            
+            while (currentDate < endDate) {
+                const dayOfWeek = currentDate.getDay();
+                // 0 = Sunday, 6 = Saturday
+                if (dayOfWeek === 0 || dayOfWeek === 6) {
+                    return true;
+                }
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+            return false;
+        }
+    });
+</script>
+{% endblock %} 

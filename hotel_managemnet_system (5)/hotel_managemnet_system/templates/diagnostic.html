@@ -1,0 +1,115 @@
+{% extends "layout.html" %}
+
+{% block title %}Maintenance Diagnostic{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">Maintenance Database Diagnostic</h3>
+        </div>
+        <div class="card-body">
+            {% if not table_exists %}
+            <div class="alert alert-warning">
+                <h4>Maintenance table does not exist in the database!</h4>
+                <p>The system will attempt to create it when needed. This is normal if this is a new installation.</p>
+            </div>
+            {% else %}
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card mb-3">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0">Database Columns</h5>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-group">
+                                {% for column in db_columns %}
+                                <li class="list-group-item {% if column not in model_columns %}list-group-item-warning{% endif %}">
+                                    {{ column }}
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card mb-3">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0">Model Definition</h5>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-group">
+                                {% for column in model_columns %}
+                                <li class="list-group-item {% if column not in db_columns %}list-group-item-danger{% endif %}">
+                                    {{ column }}
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-4">
+                {% if match %}
+                <div class="alert alert-success">
+                    <h5><i class="bi bi-check-circle-fill me-2"></i> Database structure matches model definition!</h5>
+                    <p class="mb-0">All columns in the model are present in the database and vice versa.</p>
+                </div>
+                {% else %}
+                <div class="alert alert-danger">
+                    <h5><i class="bi bi-exclamation-triangle-fill me-2"></i> Database structure doesn't match model definition!</h5>
+                    <p>Please check the highlighted columns above. Yellow indicates columns that are in the database but not in the model. Red indicates columns that are in the model but not in the database.</p>
+                    <p class="mb-0">This can cause issues with maintenance functionality.</p>
+                </div>
+                {% endif %}
+            </div>
+            
+            {% if priority_exists %}
+            <div class="alert alert-warning mt-3">
+                <h5><i class="bi bi-exclamation-triangle-fill me-2"></i> Priority Column Detected</h5>
+                <p>The "Priority" column exists in your database but has been removed from the application model. This might cause errors in the maintenance functionality.</p>
+                <form method="POST" action="{{ url_for('drop_column') }}" class="mt-2" onsubmit="return confirm('Are you sure you want to drop the Priority column? This action cannot be undone.');">
+                    <input type="hidden" name="column_name" value="Priority">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash"></i> Drop Priority Column
+                    </button>
+                </form>
+                <small class="text-muted mt-2">Note: This will remove the Priority column from the Maintenance table. The application will use the priority value stored in the Issue_Reported text instead.</small>
+            </div>
+            {% endif %}
+            
+            {% if resolved_date_exists %}
+            <div class="alert alert-warning mt-3">
+                <h5><i class="bi bi-exclamation-triangle-fill me-2"></i> Resolved_Date Column Detected</h5>
+                <p>The "Resolved_Date" column exists in your database but has been removed from the application model. This might cause errors in the maintenance functionality.</p>
+                <form method="POST" action="{{ url_for('drop_column') }}" class="mt-2" onsubmit="return confirm('Are you sure you want to drop the Resolved_Date column? This action cannot be undone.');">
+                    <input type="hidden" name="column_name" value="Resolved_Date">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash"></i> Drop Resolved_Date Column
+                    </button>
+                </form>
+                <small class="text-muted mt-2">Note: This will remove the Resolved_Date column from the Maintenance table. The application will store completion dates in the Issue_Reported text instead.</small>
+            </div>
+            {% endif %}
+            
+            {% if not match %}
+            <div class="alert alert-danger mt-3">
+                <h5><i class="bi bi-exclamation-triangle-fill me-2"></i> Database Structure Mismatch</h5>
+                <p>The database structure does not match the application model. The easiest way to fix this is to recreate the table with the correct structure.</p>
+                <form method="POST" action="{{ url_for('recreate_maintenance_table') }}" class="mt-2" onsubmit="return confirm('Are you sure you want to recreate the Maintenance table? This will attempt to preserve existing data but might cause data loss if the structures are too different. This action cannot be undone.');">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-arrow-repeat"></i> Recreate Maintenance Table
+                    </button>
+                </form>
+                <small class="text-muted mt-2">Note: This will drop and recreate the Maintenance table with the correct structure. The application will try to preserve existing data but this is not guaranteed if the structures are too different.</small>
+            </div>
+            {% endif %}
+            {% endif %}
+        </div>
+        <div class="card-footer">
+            <a href="{{ url_for('dashboard') }}" class="btn btn-primary">Return to Dashboard</a>
+        </div>
+    </div>
+</div>
+{% endblock %} 
