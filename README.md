@@ -39,6 +39,7 @@ This repository contains the complete relational database schema for a **Hotel M
 - **Languages:** SQL 
 
 ## Team Members
-- **[Surya siddardha]** – [GitHubUsername1](https://github.com/suryasiddardha)  
+- **Khamlesh Gupta** – [@khamlesh](https://github.com/Khamlesh)
+- **Surya siddardha** - [@Surya siddardha] (https://github.com/suryasiddardha)
 - 
 
